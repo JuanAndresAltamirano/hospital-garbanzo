@@ -1,0 +1,114 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: clinica_mullo
+          MYSQL_USER: clinica_user
+          MYSQL_PASSWORD: clinica_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install frontend dependencies
+      run: npm ci
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, mysql, pdo_mysql
+
+    - name: Set up database
+      run: |
+        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
+
+    - name: Create uploads directory
+      run: |
+        mkdir -p backend/uploads
+        chmod 777 backend/uploads
+
+    - name: Start PHP server
+      run: php -S localhost:8000 &
+      
+    - name: Start frontend
+      run: npm run dev &
+
+    - name: Wait for servers
+      run: |
+        while ! nc -z localhost:8000; do sleep 1; done
+        while ! nc -z localhost:5174; do sleep 1; done
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        browser: chrome
+        wait-on: 'http://localhost:5174'
+        config: baseUrl=http://localhost:5174
+      env:
+        CYPRESS_BASE_URL: http://localhost:5174
+
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: clinica_mullo
+          MYSQL_USER: clinica_user
+          MYSQL_PASSWORD: clinica_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, mysql, pdo_mysql
+        coverage: xdebug
+
+    - name: Install PHP dependencies
+      run: |
+        cd backend
+        composer install --no-interaction
+
+    - name: Set up database
+      run: |
+        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
+
+    - name: Create uploads directory
+      run: |
+        mkdir -p backend/uploads
+        chmod 777 backend/uploads
+
+    - name: Run PHP tests
+      run: |
+        cd backend
+        ./vendor/bin/phpunit tests --testdox 

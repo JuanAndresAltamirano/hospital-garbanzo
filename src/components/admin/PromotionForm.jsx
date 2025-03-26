@@ -1,80 +1,61 @@
 import { useState } from 'react';
 import './PromotionForm.css';
 
-const API_URL = 'http://localhost/backend/api';
-
-const PromotionForm = ({ onSuccess }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    validUntil: '',
-  });
+const PromotionForm = ({ onSubmit, onClose }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [validUntil, setValidUntil] = useState('');
   const [image, setImage] = useState(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
 
+    // Form validation
+    if (!title || !description || !validUntil || !image) {
+      setError('Please fill in all fields and select an image');
+      setLoading(false);
+      return;
+    }
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('validUntil', validUntil);
+    formData.append('image', image);
+
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('image', image);
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('validUntil', formData.validUntil);
-
-      const response = await fetch(`${API_URL}/promotions.php`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al crear la promoción');
-      }
-
-      // Reset form
-      setFormData({ title: '', description: '', validUntil: '' });
-      setImage(null);
-      alert('¡Promoción publicada exitosamente!');
-      
-      if (onSuccess) {
-        onSuccess();
+      const result = await onSubmit(formData);
+      if (result.success) {
+        onClose();
+      } else {
+        setError(result.error);
       }
     } catch (error) {
-      console.error('Error al publicar la promoción:', error);
-      alert('Error al publicar la promoción. Por favor intente nuevamente.');
+      setError('An error occurred while creating the promotion');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form className="promotion-form" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="promotion-form">
       <h2>Nueva Promoción</h2>
+      
+      {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
         <label htmlFor="title">Título</label>
         <input
           type="text"
           id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          disabled={loading}
         />
       </div>
 
@@ -82,10 +63,9 @@ const PromotionForm = ({ onSuccess }) => {
         <label htmlFor="description">Descripción</label>
         <textarea
           id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          required
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={loading}
         />
       </div>
 
@@ -94,10 +74,9 @@ const PromotionForm = ({ onSuccess }) => {
         <input
           type="date"
           id="validUntil"
-          name="validUntil"
-          value={formData.validUntil}
-          onChange={handleChange}
-          required
+          value={validUntil}
+          onChange={(e) => setValidUntil(e.target.value)}
+          disabled={loading}
         />
       </div>
 
@@ -106,15 +85,20 @@ const PromotionForm = ({ onSuccess }) => {
         <input
           type="file"
           id="image"
-          accept="image/*"
-          onChange={handleImageChange}
-          required
+          accept="image/jpeg,image/png,image/gif"
+          onChange={(e) => setImage(e.target.files[0])}
+          disabled={loading}
         />
       </div>
 
-      <button type="submit" className="btn btn-primary" disabled={loading}>
-        {loading ? 'Publicando...' : 'Publicar Promoción'}
-      </button>
+      <div className="form-actions">
+        <button type="button" onClick={onClose} disabled={loading}>
+          Cancelar
+        </button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Publicando...' : 'Publicar'}
+        </button>
+      </div>
     </form>
   );
 };

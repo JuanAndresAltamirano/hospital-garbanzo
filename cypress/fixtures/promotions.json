@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "Sample Promotion 1",
+    "description": "Sample Description 1",
+    "image_url": "/uploads/test-image.jpg",
+    "valid_until": "2024-12-31",
+    "created_at": "2024-03-26 17:00:00",
+    "updated_at": "2024-03-26 17:00:00"
+  },
+  {
+    "id": 2,
+    "title": "Sample Promotion 2",
+    "description": "Sample Description 2",
+    "image_url": "/uploads/test-image.jpg",
+    "valid_until": "2024-12-31",
+    "created_at": "2024-03-26 16:00:00",
+    "updated_at": "2024-03-26 16:00:00"
+  },
+  {
+    "id": 3,
+    "title": "Sample Promotion 3",
+    "description": "Sample Description 3",
+    "image_url": "/uploads/test-image.jpg",
+    "valid_until": "2024-12-31",
+    "created_at": "2024-03-26 15:00:00",
+    "updated_at": "2024-03-26 15:00:00"
+  }
+] 

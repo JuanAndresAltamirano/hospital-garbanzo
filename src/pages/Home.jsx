@@ -1,32 +1,65 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import axios from 'axios';
 import { FaHospital, FaUserMd, FaAmbulance } from 'react-icons/fa';
 import Promotion from '../components/Promotion';
 import './Home.css';
 
+const PromotionCard = ({ promotion }) => {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <div key={promotion.id} className="promotion-card">
+      <img 
+        src={`http://localhost:8000${promotion.image_url}`} 
+        alt={promotion.title}
+        onError={(e) => {
+          setImageError(true);
+          e.target.style.display = 'none';
+        }}
+      />
+      {imageError && (
+        <div className="image-placeholder">
+          <FaHospital size={48} />
+        </div>
+      )}
+      <div className="promotion-content">
+        <h3>{promotion.title}</h3>
+        <p>{promotion.description}</p>
+        <p className="valid-until">
+          Válido hasta: {new Date(promotion.valid_until).toLocaleDateString()}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
   const [latestPromotions, setLatestPromotions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchLatestPromotions = async () => {
-      const q = query(
-        collection(db, 'promotions'),
-        orderBy('createdAt', 'desc'),
-        limit(3)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const promotions = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
-      setLatestPromotions(promotions);
+      try {
+        const response = await axios.get('http://localhost:8000/backend/api/promotions.php');
+        // Sort by created_at desc and take first 3
+        const sortedPromotions = response.data
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .slice(0, 3);
+        setLatestPromotions(sortedPromotions);
+      } catch (error) {
+        console.error('Error fetching promotions:', error);
+        setError('Error loading promotions. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchLatestPromotions();
   }, []);
+
+  if (loading) return <div className="loading">Cargando promociones...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="home">
@@ -74,18 +107,18 @@ const Home = () => {
         </div>
       </section>
 
-      {latestPromotions.length > 0 && (
-        <section className="promotions">
-          <div className="container">
-            <h2>Promociones Actuales</h2>
-            <div className="promotions-grid">
-              {latestPromotions.map(promotion => (
-                <Promotion key={promotion.id} {...promotion} />
-              ))}
-            </div>
+      <section className="promotions-section">
+        <h2>Promociones Actuales</h2>
+        {latestPromotions.length > 0 ? (
+          <div className="promotions-grid">
+            {latestPromotions.map(promotion => (
+              <PromotionCard key={promotion.id} promotion={promotion} />
+            ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <p className="no-promotions">No hay promociones disponibles en este momento.</p>
+        )}
+      </section>
 
       <section className="cta">
         <div className="container">

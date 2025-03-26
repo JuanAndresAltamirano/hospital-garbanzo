@@ -47,6 +47,59 @@ To run the tests:
 php tests/run_tests.php
 ```
 
+## Testing
+
+This project includes both frontend and backend tests:
+
+### Frontend Tests (Cypress)
+
+End-to-end tests are written using Cypress. To run the tests:
+
+1. Start the backend server:
+```bash
+php -S localhost:8000
+```
+
+2. Start the frontend development server:
+```bash
+npm run dev
+```
+
+3. Run the tests:
+```bash
+# Run tests in headless mode
+npm test
+
+# Run tests with UI
+npm run test:open
+
+# Run tests in CI mode
+npm run test:ci
+```
+
+### Backend Tests (PHPUnit)
+
+PHP unit tests are located in the `backend/tests` directory. To run the tests:
+
+```bash
+cd backend
+./vendor/bin/phpunit tests
+```
+
+### Continuous Integration
+
+Tests are automatically run on GitHub Actions when:
+- Pushing to main/master branch
+- Creating a pull request to main/master branch
+
+The CI pipeline:
+1. Sets up Node.js and PHP environments
+2. Configures MySQL database
+3. Runs frontend tests using Cypress
+4. Runs backend tests using PHPUnit
+
+Test results and coverage reports are available in the GitHub Actions interface.
+
 ## Database Structure
 
 ### Promotions Table

@@ -4,13 +4,16 @@ import { FaHospital, FaUserMd, FaAmbulance } from 'react-icons/fa';
 import Promotion from '../components/Promotion';
 import './Home.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const UPLOADS_URL = import.meta.env.VITE_UPLOADS_URL || 'http://localhost:8000/backend/uploads';
+
 const PromotionCard = ({ promotion }) => {
   const [imageError, setImageError] = useState(false);
 
   return (
     <div key={promotion.id} className="promotion-card">
       <img 
-        src={`http://localhost:8000${promotion.image_url}`} 
+        src={`${UPLOADS_URL}${promotion.image_url.replace('/uploads', '')}`}
         alt={promotion.title}
         onError={(e) => {
           setImageError(true);
@@ -41,7 +44,7 @@ const Home = () => {
   useEffect(() => {
     const fetchLatestPromotions = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/backend/api/promotions.php');
+        const response = await axios.get(`${API_URL}/backend/api/promotions.php`);
         // Sort by created_at desc and take first 3
         const sortedPromotions = response.data
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "test": "cypress run",
     "test:ci": "cypress run --config-file cypress.config.ci.js",
-    "test:open": "cypress open"
+    "test:open": "cypress open",
+    "test:setup": "./scripts/setup-test-env.sh",
+    "test:local": "npm run test:setup"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

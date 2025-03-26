@@ -13,6 +13,14 @@
 *.sublime-project
 *.sublime-workspace
 
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.ico
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

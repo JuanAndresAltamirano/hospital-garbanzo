@@ -83,7 +83,7 @@ jobs:
 
     - name: Upload test artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-logs
         path: |
@@ -91,6 +91,8 @@ jobs:
           cypress/screenshots/**
           php-server.log
           frontend-server.log
+        compression-level: 9
+        retention-days: 5
 
   backend-tests:
     runs-on: ubuntu-latest
@@ -136,4 +138,13 @@ jobs:
     - name: Run PHP tests
       run: |
         cd backend
-        ./vendor/bin/phpunit tests --testdox 
+        ./vendor/bin/phpunit tests --testdox
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: php-test-results
+        path: backend/tests/_output
+        compression-level: 9
+        retention-days: 5 

@@ -40,9 +40,21 @@ jobs:
         php-version: '8.2'
         extensions: mbstring, mysql, pdo_mysql
 
+    - name: Create database directories
+      run: |
+        mkdir -p backend/database
+        ls -la backend/database
+
     - name: Set up database
       run: |
+        if [ ! -f backend/database/schema.sql ]; then
+          echo "Error: schema.sql not found!"
+          exit 1
+        fi
+        echo "Importing database schema..."
         mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
+        echo "Database setup complete!"
+        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo -e "SHOW TABLES;"
 
     - name: Create and configure uploads directory
       run: |
@@ -124,9 +136,21 @@ jobs:
         cd backend
         composer install --no-interaction
 
+    - name: Create database directories
+      run: |
+        mkdir -p backend/database
+        ls -la backend/database
+
     - name: Set up database
       run: |
+        if [ ! -f backend/database/schema.sql ]; then
+          echo "Error: schema.sql not found!"
+          exit 1
+        fi
+        echo "Importing database schema..."
         mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
+        echo "Database setup complete!"
+        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo -e "SHOW TABLES;"
 
     - name: Create and configure uploads directory
       run: |

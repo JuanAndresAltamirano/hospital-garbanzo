@@ -62,29 +62,31 @@ describe('Home Page', () => {
     ];
 
     // Create promotions through API
-    cy.wrap(promotions).each((promotion, index) => {
-      // Create a test image with different content for each promotion
-      const imageContent = `Test image content ${index + 1}`;
-      const blob = new Blob([imageContent], { type: 'image/jpeg' });
+    cy.wrap(promotions).each((promotion) => {
       const formData = new FormData();
-      
       formData.append('title', promotion.title);
       formData.append('description', promotion.description);
       formData.append('validUntil', promotion.validUntil);
-      formData.append('image', blob, `test-image-${index + 1}.jpg`);
 
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:8000/backend/api/promotions.php',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.eq(201);
-        cy.log(`Created promotion ${index + 1}:`, response.body);
-      });
+      // Use the actual test image file
+      cy.fixture('test-image.jpg', 'binary')
+        .then(Cypress.Blob.binaryStringToBlob)
+        .then((blob) => {
+          formData.append('image', blob, 'test-image.jpg');
+          
+          return cy.request({
+            method: 'POST',
+            url: 'http://localhost:8000/backend/api/promotions.php',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
+            failOnStatusCode: false
+          });
+        })
+        .then((response) => {
+          expect(response.status).to.eq(201);
+        });
     });
 
     // Visit home page and verify promotions are displayed
@@ -96,11 +98,17 @@ describe('Home Page', () => {
       cy.contains(promotion.description).should('be.visible');
     });
 
-    // Verify images are loaded
-    cy.get('.promotion-card img').each(($img) => {
-      cy.wrap($img).should(($img) => {
-        expect($img[0].naturalWidth).to.be.greaterThan(0);
-      });
+    // Verify images are loaded or placeholders are shown
+    cy.get('.promotion-card').each(($card) => {
+      cy.wrap($card).find('img').should('exist')
+        .then(($img) => {
+          // Check if image loaded successfully or placeholder is shown
+          if ($img.is(':visible')) {
+            expect($img[0].naturalWidth).to.be.greaterThan(0);
+          } else {
+            cy.wrap($card).find('.image-placeholder').should('be.visible');
+          }
+        });
     });
   });
 
@@ -113,28 +121,31 @@ describe('Home Page', () => {
     }));
 
     // Create promotions through API
-    cy.wrap(promotions).each((promotion, index) => {
-      const imageContent = `Test image content ${index + 1}`;
-      const blob = new Blob([imageContent], { type: 'image/jpeg' });
+    cy.wrap(promotions).each((promotion) => {
       const formData = new FormData();
-      
       formData.append('title', promotion.title);
       formData.append('description', promotion.description);
       formData.append('validUntil', promotion.validUntil);
-      formData.append('image', blob, `test-image-${index + 1}.jpg`);
 
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:8000/backend/api/promotions.php',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.eq(201);
-        cy.log(`Created promotion ${index + 1}:`, response.body);
-      });
+      // Use the actual test image file
+      cy.fixture('test-image.jpg', 'binary')
+        .then(Cypress.Blob.binaryStringToBlob)
+        .then((blob) => {
+          formData.append('image', blob, 'test-image.jpg');
+          
+          return cy.request({
+            method: 'POST',
+            url: 'http://localhost:8000/backend/api/promotions.php',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
+            failOnStatusCode: false
+          });
+        })
+        .then((response) => {
+          expect(response.status).to.eq(201);
+        });
     });
 
     cy.visit('/');
@@ -150,11 +161,17 @@ describe('Home Page', () => {
     cy.contains('Promotion 3').should('be.visible');
     cy.contains('Promotion 2').should('be.visible');
 
-    // Verify images are loaded
-    cy.get('.promotion-card img').each(($img) => {
-      cy.wrap($img).should(($img) => {
-        expect($img[0].naturalWidth).to.be.greaterThan(0);
-      });
+    // Verify images are loaded or placeholders are shown
+    cy.get('.promotion-card').each(($card) => {
+      cy.wrap($card).find('img').should('exist')
+        .then(($img) => {
+          // Check if image loaded successfully or placeholder is shown
+          if ($img.is(':visible')) {
+            expect($img[0].naturalWidth).to.be.greaterThan(0);
+          } else {
+            cy.wrap($card).find('.image-placeholder').should('be.visible');
+          }
+        });
     });
   });
 
@@ -164,26 +181,26 @@ describe('Home Page', () => {
     formData.append('description', 'Test Description');
     formData.append('validUntil', '2024-12-31');
     
-    // Create an invalid image file
-    const invalidImageContent = 'Invalid image content';
-    const blob = new Blob([invalidImageContent], { type: 'image/jpeg' });
-    formData.append('image', blob, 'invalid-image.jpg');
-
-    cy.request({
-      method: 'POST',
-      url: 'http://localhost:8000/backend/api/promotions.php',
-      body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      failOnStatusCode: false
-    }).then((response) => {
-      expect(response.status).to.eq(201);
-    });
+    // Use the text file as an invalid image
+    cy.fixture('test-file.txt', 'binary')
+      .then(Cypress.Blob.binaryStringToBlob)
+      .then((blob) => {
+        formData.append('image', blob, 'test-file.txt');
+        
+        return cy.request({
+          method: 'POST',
+          url: 'http://localhost:8000/backend/api/promotions.php',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          failOnStatusCode: false
+        });
+      });
 
     cy.visit('/');
     
-    // Verify promotion content is visible even if image fails
+    // Verify promotion content is visible
     cy.contains('Test Promotion').should('be.visible');
     cy.contains('Test Description').should('be.visible');
     

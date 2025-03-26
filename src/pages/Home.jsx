@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaHospital, FaUserMd, FaAmbulance } from 'react-icons/fa';
 import Promotion from '../components/Promotion';
 import './Home.css';
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const UPLOADS_URL = import.meta.env.VITE_UPLOADS_URL || 'http://localhost:8000/backend/uploads';
@@ -10,15 +12,17 @@ const UPLOADS_URL = import.meta.env.VITE_UPLOADS_URL || 'http://localhost:8000/b
 const PromotionCard = ({ promotion }) => {
   const [imageError, setImageError] = useState(false);
 
+  const handleImageError = (e) => {
+    setImageError(true);
+    e.target.style.display = 'none';
+  };
+
   return (
     <div key={promotion.id} className="promotion-card">
       <img 
         src={`${UPLOADS_URL}${promotion.image_url.replace('/uploads', '')}`}
         alt={promotion.title}
-        onError={(e) => {
-          setImageError(true);
-          e.target.style.display = 'none';
-        }}
+        onError={handleImageError}
       />
       {imageError && (
         <div className="image-placeholder">
@@ -29,7 +33,7 @@ const PromotionCard = ({ promotion }) => {
         <h3>{promotion.title}</h3>
         <p>{promotion.description}</p>
         <p className="valid-until">
-          Válido hasta: {new Date(promotion.valid_until).toLocaleDateString()}
+          Válido hasta: {format(new Date(promotion.valid_until), 'dd/MM/yyyy')}
         </p>
       </div>
     </div>
@@ -37,32 +41,36 @@ const PromotionCard = ({ promotion }) => {
 };
 
 const Home = () => {
-  const [latestPromotions, setLatestPromotions] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchLatestPromotions = async () => {
+    const fetchPromotions = async () => {
       try {
-        const response = await axios.get(`${API_URL}/backend/api/promotions.php`);
-        // Sort by created_at desc and take first 3
+        const response = await axios.get('http://localhost:8000/backend/api/promotions.php');
+        // Sort by created_at in descending order and take the latest 3
         const sortedPromotions = response.data
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
           .slice(0, 3);
-        setLatestPromotions(sortedPromotions);
+        setPromotions(sortedPromotions);
       } catch (error) {
         console.error('Error fetching promotions:', error);
-        setError('Error loading promotions. Please try again later.');
+        toast.error('Error al cargar las promociones');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLatestPromotions();
+    fetchPromotions();
   }, []);
 
-  if (loading) return <div className="loading">Cargando promociones...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const handleImageError = (e) => {
+    e.target.style.display = 'none';
+    const placeholder = e.target.nextElementSibling;
+    if (placeholder) {
+      placeholder.style.display = 'flex';
+    }
+  };
 
   return (
     <div className="home">
@@ -112,14 +120,35 @@ const Home = () => {
 
       <section className="promotions-section">
         <h2>Promociones Actuales</h2>
-        {latestPromotions.length > 0 ? (
-          <div className="promotions-grid">
-            {latestPromotions.map(promotion => (
-              <PromotionCard key={promotion.id} promotion={promotion} />
+        {loading ? (
+          <div className="text-center py-8">Cargando promociones...</div>
+        ) : promotions.length === 0 ? (
+          <p className="text-center py-8">No hay promociones disponibles en este momento.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {promotions.map(promotion => (
+              <div key={promotion.id} className="promotion-card border rounded-lg overflow-hidden">
+                <div className="relative aspect-video">
+                  <img
+                    src={`${UPLOADS_URL}${promotion.image_url}`}
+                    alt={promotion.title}
+                    className="w-full h-full object-cover"
+                    onError={handleImageError}
+                  />
+                  <div className="image-placeholder hidden absolute inset-0 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-500">Image not available</span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2">{promotion.title}</h3>
+                  <p className="text-gray-600 mb-2">{promotion.description}</p>
+                  <p className="text-sm text-gray-500">
+                    Válido hasta: {format(new Date(promotion.valid_until), 'dd/MM/yyyy')}
+                  </p>
+                </div>
+              </div>
             ))}
           </div>
-        ) : (
-          <p className="no-promotions">No hay promociones disponibles en este momento.</p>
         )}
       </section>
 

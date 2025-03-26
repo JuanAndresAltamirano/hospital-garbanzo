@@ -1,174 +1,136 @@
-name: Tests
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master ]
 
 jobs:
-  frontend-tests:
+  test:
     runs-on: ubuntu-latest
-    
+
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: clinica_mullo
           MYSQL_USER: clinica_user
           MYSQL_PASSWORD: clinica_password
+          MYSQL_ROOT_PASSWORD: root_password
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mysqli, json, gd
+        coverage: xdebug
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick
+
+    - name: Create necessary directories and test files
+      run: |
+        mkdir -p backend/uploads
+        chmod 777 backend/uploads
+        mkdir -p backend/database
+        chmod 777 backend/database
+        mkdir -p cypress/fixtures
+        
+        # Create test images
+        convert -size 100x100 xc:white -pointsize 20 -gravity center -draw "text 0,0 'Test'" backend/uploads/test-image.jpg
+        convert -size 100x100 xc:white -pointsize 20 -gravity center -draw "text 0,0 'Test 1'" backend/uploads/test-image-1.jpg
+        convert -size 100x100 xc:white -pointsize 20 -gravity center -draw "text 0,0 'Test 2'" backend/uploads/test-image-2.jpg
+        convert -size 100x100 xc:white -pointsize 20 -gravity center -draw "text 0,0 'Test 3'" backend/uploads/test-image-3.jpg
+        
+        # Copy test images to Cypress fixtures
+        cp backend/uploads/test-image.jpg cypress/fixtures/
+        echo "This is not an image" > cypress/fixtures/test-file.txt
+
+    - name: Verify MySQL connection
+      run: |
+        mysql --host 127.0.0.1 --port 3306 -u clinica_user -pclinica_password -e "SHOW DATABASES;"
+
+    - name: Import database schema
+      run: |
+        mysql --host 127.0.0.1 --port 3306 -u clinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
+
+    - name: Install Composer dependencies
+      working-directory: ./backend
+      run: |
+        curl -sS https://getcomposer.org/installer | php
+        php composer.phar install --prefer-dist --no-interaction
+
+    - name: Run PHP tests
+      working-directory: ./backend
+      run: vendor/bin/phpunit --coverage-text
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '18'
         cache: 'npm'
 
-    - name: Install frontend dependencies
+    - name: Install Node.js dependencies
       run: npm ci
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, mysql, pdo_mysql
-
-    - name: Create database directories
+    - name: Start PHP development server
       run: |
-        mkdir -p backend/database
-        ls -la backend/database
-
-    - name: Set up database
-      run: |
-        if [ ! -f backend/database/schema.sql ]; then
-          echo "Error: schema.sql not found!"
-          exit 1
-        fi
-        echo "Importing database schema..."
-        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
-        echo "Database setup complete!"
-        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo -e "SHOW TABLES;"
-
-    - name: Create and configure uploads directory
-      run: |
-        sudo mkdir -p backend/uploads
-        sudo chmod -R 777 backend/uploads
-        sudo chown -R $USER:$USER backend/uploads
-        ls -la backend/uploads
-
-    - name: Start PHP server
-      run: |
+        # Start PHP server with error logging
         php -S localhost:8000 2>&1 | tee php-server.log &
-      
-    - name: Start frontend
-      run: |
-        npm run dev | tee frontend-server.log &
-
-    - name: Wait for servers
-      run: |
-        while ! nc -z localhost:8000; do 
+        echo $! > php-server.pid
+        
+        # Wait for the server to be ready
+        while ! nc -z localhost 8000; do
           echo "Waiting for PHP server..."
           sleep 1
         done
-        while ! nc -z localhost:5174; do 
-          echo "Waiting for frontend server..."
+
+    - name: Start Vite development server
+      run: |
+        npm run dev &
+        echo $! > vite-server.pid
+        
+        # Wait for the server to be ready
+        while ! nc -z localhost 5173; do
+          echo "Waiting for Vite server..."
           sleep 1
         done
-        echo "Both servers are up!"
 
     - name: Run Cypress tests
-      uses: cypress-io/github-action@v6
-      with:
-        browser: chrome
-        wait-on: 'http://localhost:5174'
-        config: baseUrl=http://localhost:5174
-      env:
-        CYPRESS_BASE_URL: http://localhost:5174
-        DEBUG: "cypress:*"
+      run: npm run test:e2e
 
-    - name: Upload test artifacts
+    - name: Upload server logs
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs
+        name: server-logs
         path: |
-          cypress/videos/**
-          cypress/screenshots/**
           php-server.log
-          frontend-server.log
-        compression-level: 9
+          backend/uploads/*
         retention-days: 5
 
-  backend-tests:
-    runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: clinica_mullo
-          MYSQL_USER: clinica_user
-          MYSQL_PASSWORD: clinica_password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, mysql, pdo_mysql
-        coverage: xdebug
-
-    - name: Install PHP dependencies
-      run: |
-        cd backend
-        composer install --no-interaction
-
-    - name: Create database directories
-      run: |
-        mkdir -p backend/database
-        ls -la backend/database
-
-    - name: Set up database
-      run: |
-        if [ ! -f backend/database/schema.sql ]; then
-          echo "Error: schema.sql not found!"
-          exit 1
-        fi
-        echo "Importing database schema..."
-        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
-        echo "Database setup complete!"
-        mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo -e "SHOW TABLES;"
-
-    - name: Create and configure uploads directory
-      run: |
-        sudo mkdir -p backend/uploads
-        sudo chmod -R 777 backend/uploads
-        sudo chown -R $USER:$USER backend/uploads
-        ls -la backend/uploads
-
-    - name: Run PHP tests
-      run: |
-        cd backend
-        ./vendor/bin/phpunit tests --testdox
-
-    - name: Upload test results
+    - name: Stop servers
       if: always()
+      run: |
+        if [ -f php-server.pid ]; then kill $(cat php-server.pid); fi
+        if [ -f vite-server.pid ]; then kill $(cat vite-server.pid); fi
+
+    - name: Upload test coverage
+      if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: php-test-results
-        path: backend/tests/_output
-        compression-level: 9
-        retention-days: 5 
+        name: code-coverage
+        path: backend/coverage 

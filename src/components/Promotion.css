@@ -1,0 +1,44 @@
+.promotion-card {
+  background: var(--secondary-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+}
+
+.promotion-card:hover {
+  transform: translateY(-5px);
+}
+
+.promotion-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.promotion-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.promotion-content {
+  padding: 1.5rem;
+}
+
+.promotion-content h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.promotion-content p {
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.valid-until {
+  font-size: 0.875rem;
+  color: #666;
+  font-style: italic;
+} 

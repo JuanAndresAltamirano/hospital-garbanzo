@@ -1,0 +1,49 @@
+name: Database Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: clinica_mullo
+          MYSQL_USER: clinica_user
+          MYSQL_PASSWORD: clinica_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mysqli
+
+    - name: Initialize Database
+      run: |
+        mysql -h127.0.0.1 -P3306 -uclinica_user -pclinica_password clinica_mullo < database/init.sql
+
+    - name: Run Tests
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_USER: clinica_user
+        DB_PASSWORD: clinica_password
+        DB_NAME: clinica_mullo
+      run: php tests/run_tests.php 

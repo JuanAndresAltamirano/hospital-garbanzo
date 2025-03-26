@@ -44,21 +44,32 @@ jobs:
       run: |
         mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
 
-    - name: Create uploads directory
+    - name: Create and configure uploads directory
       run: |
-        mkdir -p backend/uploads
-        chmod 777 backend/uploads
+        sudo mkdir -p backend/uploads
+        sudo chmod -R 777 backend/uploads
+        sudo chown -R $USER:$USER backend/uploads
+        ls -la backend/uploads
 
     - name: Start PHP server
-      run: php -S localhost:8000 &
+      run: |
+        php -S localhost:8000 2>&1 | tee php-server.log &
       
     - name: Start frontend
-      run: npm run dev &
+      run: |
+        npm run dev | tee frontend-server.log &
 
     - name: Wait for servers
       run: |
-        while ! nc -z localhost:8000; do sleep 1; done
-        while ! nc -z localhost:5174; do sleep 1; done
+        while ! nc -z localhost:8000; do 
+          echo "Waiting for PHP server..."
+          sleep 1
+        done
+        while ! nc -z localhost:5174; do 
+          echo "Waiting for frontend server..."
+          sleep 1
+        done
+        echo "Both servers are up!"
 
     - name: Run Cypress tests
       uses: cypress-io/github-action@v6
@@ -68,6 +79,18 @@ jobs:
         config: baseUrl=http://localhost:5174
       env:
         CYPRESS_BASE_URL: http://localhost:5174
+        DEBUG: "cypress:*"
+
+    - name: Upload test artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-logs
+        path: |
+          cypress/videos/**
+          cypress/screenshots/**
+          php-server.log
+          frontend-server.log
 
   backend-tests:
     runs-on: ubuntu-latest
@@ -103,10 +126,12 @@ jobs:
       run: |
         mysql -h127.0.0.1 -uclinica_user -pclinica_password clinica_mullo < backend/database/schema.sql
 
-    - name: Create uploads directory
+    - name: Create and configure uploads directory
       run: |
-        mkdir -p backend/uploads
-        chmod 777 backend/uploads
+        sudo mkdir -p backend/uploads
+        sudo chmod -R 777 backend/uploads
+        sudo chown -R $USER:$USER backend/uploads
+        ls -la backend/uploads
 
     - name: Run PHP tests
       run: |

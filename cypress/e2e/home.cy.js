@@ -16,6 +16,13 @@ describe('Home Page', () => {
         });
       }
     });
+
+    // Create uploads directory if it doesn't exist
+    cy.task('fileExists', 'backend/uploads').then((exists) => {
+      if (!exists) {
+        cy.task('mkdir', 'backend/uploads');
+      }
+    });
   });
 
   it('should display loading state', () => {
@@ -55,18 +62,17 @@ describe('Home Page', () => {
     ];
 
     // Create promotions through API
-    cy.wrap(promotions).each((promotion) => {
-      // Create FormData and append fields
+    cy.wrap(promotions).each((promotion, index) => {
+      // Create a test image with different content for each promotion
+      const imageContent = `Test image content ${index + 1}`;
+      const blob = new Blob([imageContent], { type: 'image/jpeg' });
       const formData = new FormData();
+      
       formData.append('title', promotion.title);
       formData.append('description', promotion.description);
       formData.append('validUntil', promotion.validUntil);
-      
-      // Create a simple test image
-      const blob = Cypress.Blob.base64StringToBlob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'image/jpeg');
-      formData.append('image', blob, 'test-image.jpg');
+      formData.append('image', blob, `test-image-${index + 1}.jpg`);
 
-      // Send request
       cy.request({
         method: 'POST',
         url: 'http://localhost:8000/backend/api/promotions.php',
@@ -77,15 +83,24 @@ describe('Home Page', () => {
         failOnStatusCode: false
       }).then((response) => {
         expect(response.status).to.eq(201);
+        cy.log(`Created promotion ${index + 1}:`, response.body);
       });
     });
 
     // Visit home page and verify promotions are displayed
     cy.visit('/');
-    cy.get('.promotion-card').should('have.length', 3);
+    cy.get('.promotion-card', { timeout: 10000 }).should('have.length', 3);
+    
     promotions.forEach(promotion => {
       cy.contains(promotion.title).should('be.visible');
       cy.contains(promotion.description).should('be.visible');
+    });
+
+    // Verify images are loaded
+    cy.get('.promotion-card img').each(($img) => {
+      cy.wrap($img).should(($img) => {
+        expect($img[0].naturalWidth).to.be.greaterThan(0);
+      });
     });
   });
 
@@ -98,15 +113,15 @@ describe('Home Page', () => {
     }));
 
     // Create promotions through API
-    cy.wrap(promotions).each((promotion) => {
+    cy.wrap(promotions).each((promotion, index) => {
+      const imageContent = `Test image content ${index + 1}`;
+      const blob = new Blob([imageContent], { type: 'image/jpeg' });
       const formData = new FormData();
+      
       formData.append('title', promotion.title);
       formData.append('description', promotion.description);
       formData.append('validUntil', promotion.validUntil);
-      
-      // Create a simple test image
-      const blob = Cypress.Blob.base64StringToBlob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'image/jpeg');
-      formData.append('image', blob, 'test-image.jpg');
+      formData.append('image', blob, `test-image-${index + 1}.jpg`);
 
       cy.request({
         method: 'POST',
@@ -118,13 +133,14 @@ describe('Home Page', () => {
         failOnStatusCode: false
       }).then((response) => {
         expect(response.status).to.eq(201);
+        cy.log(`Created promotion ${index + 1}:`, response.body);
       });
     });
 
     cy.visit('/');
     
     // Should only show 3 promotions
-    cy.get('.promotion-card').should('have.length', 3);
+    cy.get('.promotion-card', { timeout: 10000 }).should('have.length', 3);
     
     // Should not show the oldest promotion
     cy.contains('Promotion 1').should('not.exist');
@@ -133,18 +149,25 @@ describe('Home Page', () => {
     cy.contains('Promotion 4').should('be.visible');
     cy.contains('Promotion 3').should('be.visible');
     cy.contains('Promotion 2').should('be.visible');
+
+    // Verify images are loaded
+    cy.get('.promotion-card img').each(($img) => {
+      cy.wrap($img).should(($img) => {
+        expect($img[0].naturalWidth).to.be.greaterThan(0);
+      });
+    });
   });
 
   it('should handle failed image loads gracefully', () => {
-    // Create a promotion with an invalid image URL
     const formData = new FormData();
     formData.append('title', 'Test Promotion');
     formData.append('description', 'Test Description');
     formData.append('validUntil', '2024-12-31');
     
-    // Create a simple test image
-    const blob = Cypress.Blob.base64StringToBlob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'image/jpeg');
-    formData.append('image', blob, 'test-image.jpg');
+    // Create an invalid image file
+    const invalidImageContent = 'Invalid image content';
+    const blob = new Blob([invalidImageContent], { type: 'image/jpeg' });
+    formData.append('image', blob, 'invalid-image.jpg');
 
     cy.request({
       method: 'POST',
@@ -154,6 +177,8 @@ describe('Home Page', () => {
         'Content-Type': 'multipart/form-data'
       },
       failOnStatusCode: false
+    }).then((response) => {
+      expect(response.status).to.eq(201);
     });
 
     cy.visit('/');
@@ -161,5 +186,8 @@ describe('Home Page', () => {
     // Verify promotion content is visible even if image fails
     cy.contains('Test Promotion').should('be.visible');
     cy.contains('Test Description').should('be.visible');
+    
+    // Verify placeholder is shown for failed image
+    cy.get('.image-placeholder').should('be.visible');
   });
 }); 

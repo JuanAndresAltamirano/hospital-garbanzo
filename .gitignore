@@ -27,6 +27,11 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
+/vendor
+/backend/vendor
+.cache
+.phar
+
 # Build directories
 /dist
 /build

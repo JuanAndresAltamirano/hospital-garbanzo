@@ -19,7 +19,8 @@
         </include>
     </coverage>
     <php>
-        <env name="DB_HOST" value="172.21.0.2"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
         <env name="DB_DATABASE" value="clinica_mullo"/>
         <env name="DB_USERNAME" value="clinica_user"/>
         <env name="DB_PASSWORD" value="clinica_password"/>

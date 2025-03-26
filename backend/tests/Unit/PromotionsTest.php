@@ -17,7 +17,8 @@ class PromotionsTest extends TestCase
             $_ENV['DB_HOST'] ?? '127.0.0.1',
             $_ENV['DB_USERNAME'] ?? 'clinica_user',
             $_ENV['DB_PASSWORD'] ?? 'clinica_password',
-            $_ENV['DB_DATABASE'] ?? 'clinica_mullo'
+            $_ENV['DB_DATABASE'] ?? 'clinica_mullo',
+            $_ENV['DB_PORT'] ?? '3306'
         );
 
         if ($this->conn->connect_error) {

@@ -1,7 +1,8 @@
 <?php
 
 // Load environment variables from phpunit.xml
-$_ENV['DB_HOST'] = $_ENV['DB_HOST'] ?? '172.21.0.2';
+$_ENV['DB_HOST'] = $_ENV['DB_HOST'] ?? '127.0.0.1';
+$_ENV['DB_PORT'] = $_ENV['DB_PORT'] ?? '3306';
 $_ENV['DB_DATABASE'] = $_ENV['DB_DATABASE'] ?? 'clinica_mullo';
 $_ENV['DB_USERNAME'] = $_ENV['DB_USERNAME'] ?? 'clinica_user';
 $_ENV['DB_PASSWORD'] = $_ENV['DB_PASSWORD'] ?? 'clinica_password';
@@ -37,7 +38,8 @@ $conn = new mysqli(
     $_ENV['DB_HOST'],
     $_ENV['DB_USERNAME'],
     $_ENV['DB_PASSWORD'],
-    $_ENV['DB_DATABASE']
+    $_ENV['DB_DATABASE'],
+    $_ENV['DB_PORT']
 );
 
 if ($conn->connect_error) {

@@ -1,0 +1,159 @@
+.promotions-manager {
+  padding: 1rem;
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.manager-header h2 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.promotions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.promotion-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--background-white);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.3s ease;
+}
+
+.promotion-item:hover {
+  box-shadow: var(--shadow-large);
+}
+
+.drag-handle {
+  color: #666;
+  cursor: grab;
+  padding: 0.5rem;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.promotion-image {
+  width: 120px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  flex-shrink: 0;
+}
+
+.promotion-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.promotion-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.promotion-info h3 {
+  color: var(--text-color);
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.promotion-info p {
+  color: var(--text-color);
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.promotion-info .valid-until {
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.promotion-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+  background-color: var(--background-light);
+}
+
+.btn-icon.delete {
+  color: #dc2626;
+}
+
+.btn-icon.delete:hover {
+  background-color: #fee2e2;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--background-white);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-large);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .promotion-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .promotion-image {
+    width: 100%;
+    height: 160px;
+  }
+
+  .promotion-actions {
+    justify-content: flex-end;
+    padding-top: 1rem;
+  }
+
+  .drag-handle {
+    display: none;
+  }
+} 

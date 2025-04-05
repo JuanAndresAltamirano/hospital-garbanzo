@@ -1,83 +1,104 @@
-import { useState, useEffect } from 'react';
-import PromotionForm from '../components/admin/PromotionForm';
-import Promotion from '../components/Promotion';
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import PromotionsManager from '../components/admin/PromotionsManager';
+import ServicesManager from '../components/admin/ServicesManager';
+import PasswordReset from '../components/admin/PasswordReset';
+import TimelineManager from '../components/admin/TimelineManager';
 import './Admin.css';
 
-const API_URL = 'http://localhost/backend/api';
-
 const Admin = () => {
-  const [promotions, setPromotions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, login, logout } = useAuth();
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const fetchPromotions = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
-      const response = await fetch(`${API_URL}/promotions.php`);
-      if (!response.ok) {
-        throw new Error('Error fetching promotions');
-      }
-      const data = await response.json();
-      setPromotions(data);
-    } catch (error) {
-      console.error('Error fetching promotions:', error);
+      await login(credentials);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPromotions();
-  }, []);
-
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de que desea eliminar esta promoción?')) {
-      try {
-        const response = await fetch(`${API_URL}/promotions.php?id=${id}`, {
-          method: 'DELETE',
-        });
-
-        if (!response.ok) {
-          throw new Error('Error deleting promotion');
-        }
-
-        setPromotions(promotions.filter(promo => promo.id !== id));
-        alert('Promoción eliminada exitosamente');
-      } catch (error) {
-        console.error('Error deleting promotion:', error);
-        alert('Error al eliminar la promoción');
-      }
-    }
+  const handleLogout = () => {
+    logout();
   };
 
-  return (
-    <div className="admin">
-      <div className="container">
-        <h1>Panel de Administración</h1>
-        
-        <section className="admin-section">
-          <h2>Nueva Promoción</h2>
-          <PromotionForm onSuccess={fetchPromotions} />
-        </section>
+  if (!isAuthenticated) {
+    return (
+      <div className="admin-login-container">
+        <h2>Admin Login</h2>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              value={credentials.username}
+              onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={credentials.password}
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+              required
+            />
+          </div>
+          {error && <div className="error-message">{error}</div>}
+          <button type="submit" disabled={loading} className="login-button">
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
-        <section className="admin-section">
-          <h2>Promociones Actuales</h2>
-          {loading ? (
-            <p>Cargando promociones...</p>
-          ) : (
-            <div className="promotions-grid">
-              {promotions.map(promotion => (
-                <div key={promotion.id} className="promotion-item">
-                  <Promotion {...promotion} />
-                  <button
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(promotion.id)}
-                  >
-                    Eliminar Promoción
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+  return (
+    <div className="admin-layout">
+      <div className="admin-sidebar">
+        <h2>Admin Panel</h2>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/admin/promotions">Promotions</Link>
+            </li>
+            <li>
+              <Link to="/admin/services">Services</Link>
+            </li>
+            <li>
+              <Link to="/admin/timeline">Timeline</Link>
+            </li>
+            <li>
+              <Link to="/admin/password">Reset Password</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div className="admin-content">
+        <Routes>
+          <Route path="/promotions" element={<PromotionsManager />} />
+          <Route path="/services" element={<ServicesManager />} />
+          <Route path="/timeline" element={<TimelineManager />} />
+          <Route path="/password" element={<PasswordReset />} />
+          <Route path="/" element={<Navigate to="/admin/promotions" replace />} />
+        </Routes>
       </div>
     </div>
   );

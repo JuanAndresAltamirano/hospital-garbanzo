@@ -1,50 +1,94 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './PromotionForm.css';
 
-const PromotionForm = ({ onSubmit, onClose }) => {
+const PromotionForm = ({ promotion, onSubmit, onClose }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [validUntil, setValidUntil] = useState('');
+  const [discount, setDiscount] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [isActive, setIsActive] = useState(true);
   const [image, setImage] = useState(null);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (promotion) {
+      setTitle(promotion.title);
+      setDescription(promotion.description);
+      setDiscount(promotion.discount);
+      setStartDate(promotion.startDate.split('T')[0]);
+      setEndDate(promotion.endDate.split('T')[0]);
+      setIsActive(promotion.isActive);
+    }
+  }, [promotion]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Form validation
-    if (!title || !description || !validUntil || !image) {
-      setError('Please fill in all fields and select an image');
-      setLoading(false);
-      return;
-    }
-
-    // Create FormData object
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('validUntil', validUntil);
-    formData.append('image', image);
-
     try {
+      // First make a JSON object to convert types correctly
+      const data = {
+        title,
+        description,
+        discount: parseInt(discount, 10),
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        isActive: isActive === true || isActive === 'true'
+      };
+
+      // Now create FormData
+      const formData = new FormData();
+      
+      // Add string fields
+      formData.append('title', data.title);
+      formData.append('description', data.description);
+      
+      // Add number fields
+      formData.append('discount', data.discount.toString());
+      
+      // Add date fields - send as ISO string
+      formData.append('startDate', data.startDate);
+      formData.append('endDate', data.endDate);
+      
+      // Add boolean field
+      formData.append('isActive', data.isActive.toString());
+      
+      // Add image file if exists
+      if (image) {
+        formData.append('image', image);
+      }
+      
+      console.log("Form data being submitted:", {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        discount: formData.get('discount'),
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate'),
+        isActive: formData.get('isActive'),
+        image: image ? image.name : 'No image selected'
+      });
+
       const result = await onSubmit(formData);
+      setLoading(false);
+
       if (result.success) {
         onClose();
       } else {
         setError(result.error);
       }
-    } catch (error) {
-      setError('An error occurred while creating the promotion');
-    } finally {
+    } catch (err) {
+      console.error('Form submission error:', err);
       setLoading(false);
+      setError(err.message || 'An error occurred while saving the promotion');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="promotion-form">
-      <h2>Nueva Promoción</h2>
+      <h2>{promotion ? 'Editar Promoción' : 'Nueva Promoción'}</h2>
       
       {error && <div className="error-message">{error}</div>}
       
@@ -56,6 +100,7 @@ const PromotionForm = ({ onSubmit, onClose }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           disabled={loading}
+          required
         />
       </div>
 
@@ -66,29 +111,74 @@ const PromotionForm = ({ onSubmit, onClose }) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           disabled={loading}
+          required
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="validUntil">Válido Hasta</label>
+        <label htmlFor="discount">Descuento (%)</label>
+        <input
+          type="number"
+          id="discount"
+          min="0"
+          max="100"
+          value={discount}
+          onChange={(e) => setDiscount(e.target.value)}
+          disabled={loading}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="startDate">Fecha de Inicio</label>
         <input
           type="date"
-          id="validUntil"
-          value={validUntil}
-          onChange={(e) => setValidUntil(e.target.value)}
+          id="startDate"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
           disabled={loading}
+          required
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="image">Imagen</label>
+        <label htmlFor="endDate">Fecha de Fin</label>
+        <input
+          type="date"
+          id="endDate"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          disabled={loading}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="isActive">Estado</label>
+        <select
+          id="isActive"
+          value={isActive}
+          onChange={(e) => setIsActive(e.target.value === 'true')}
+          disabled={loading}
+        >
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="image">Imagen {!promotion && <span className="required">*</span>}</label>
         <input
           type="file"
           id="image"
-          accept="image/jpeg,image/png,image/gif"
+          accept="image/jpeg,image/png"
           onChange={(e) => setImage(e.target.files[0])}
           disabled={loading}
+          required={!promotion}
         />
+        {promotion && (
+          <small className="help-text">Deja vacío para mantener la imagen actual</small>
+        )}
       </div>
 
       <div className="form-actions">
@@ -96,7 +186,7 @@ const PromotionForm = ({ onSubmit, onClose }) => {
           Cancelar
         </button>
         <button type="submit" disabled={loading}>
-          {loading ? 'Publicando...' : 'Publicar'}
+          {loading ? (promotion ? 'Actualizando...' : 'Publicando...') : (promotion ? 'Actualizar' : 'Publicar')}
         </button>
       </div>
     </form>

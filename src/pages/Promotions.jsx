@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import Promotion from '../components/Promotion';
+import { apiService } from '../services/apiService';
 import './Promotions.css';
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'Fecha no disponible';
+  const date = parseISO(dateString);
+  return isValid(date) ? format(date, 'dd/MM/yyyy') : 'Fecha inválida';
+};
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
@@ -12,7 +18,9 @@ const Promotions = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    validUntil: '',
+    startDate: '',
+    endDate: '',
+    discount: '',
     image: null
   });
   const [errors, setErrors] = useState({});
@@ -24,8 +32,15 @@ const Promotions = () => {
 
   const fetchPromotions = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/backend/api/promotions.php');
-      setPromotions(response.data);
+      const response = await apiService.get('/promotions');
+      console.log('Promotions data:', response.data);
+      // Validate and transform dates before setting state
+      const validatedPromotions = response.data.map(promo => ({
+        ...promo,
+        startDate: promo.startDate || null,
+        endDate: promo.endDate || null,
+      }));
+      setPromotions(validatedPromotions);
     } catch (error) {
       console.error('Error fetching promotions:', error);
       toast.error('Error al cargar las promociones');
@@ -51,15 +66,10 @@ const Promotions = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setFormData(prev => ({
-      ...prev,
-      image: file
-    }));
-    // Clear error when user selects a file
-    if (errors.image) {
-      setErrors(prev => ({
+    if (file) {
+      setFormData(prev => ({
         ...prev,
-        image: ''
+        image: file
       }));
     }
   };
@@ -68,13 +78,10 @@ const Promotions = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'El título es requerido';
     if (!formData.description.trim()) newErrors.description = 'La descripción es requerida';
-    if (!formData.validUntil) newErrors.validUntil = 'La fecha de validez es requerida';
+    if (!formData.startDate) newErrors.startDate = 'La fecha de inicio es requerida';
+    if (!formData.endDate) newErrors.endDate = 'La fecha de fin es requerida';
+    if (!formData.discount) newErrors.discount = 'El descuento es requerido';
     if (!formData.image) newErrors.image = 'La imagen es requerida';
-    
-    // Validate date format
-    if (formData.validUntil && !/^\d{4}-\d{2}-\d{2}$/.test(formData.validUntil)) {
-      newErrors.validUntil = 'La fecha debe estar en formato YYYY-MM-DD';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -82,57 +89,52 @@ const Promotions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('description', formData.description);
-    formDataToSend.append('validUntil', formData.validUntil);
+    formDataToSend.append('startDate', formData.startDate);
+    formDataToSend.append('endDate', formData.endDate);
+    formDataToSend.append('discount', formData.discount);
     formDataToSend.append('image', formData.image);
 
     try {
-      await axios.post('http://localhost:8000/backend/api/promotions.php', formDataToSend, {
+      await apiService.post('/promotions', formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      
       toast.success('Promoción creada exitosamente');
       setShowForm(false);
+      fetchPromotions();
       setFormData({
         title: '',
         description: '',
-        validUntil: '',
+        startDate: '',
+        endDate: '',
+        discount: '',
         image: null
       });
-      fetchPromotions();
     } catch (error) {
-      if (error.response?.data?.error) {
-        toast.error(error.response.data.error);
-      } else {
-        toast.error('Error al crear la promoción');
-      }
+      console.error('Error creating promotion:', error);
+      toast.error('Error al crear la promoción');
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/backend/api/promotions.php?id=${id}`);
+      await apiService.delete(`/promotions/${id}`);
       toast.success('Promoción eliminada exitosamente');
       fetchPromotions();
-      setShowDeleteConfirm(null);
     } catch (error) {
+      console.error('Error deleting promotion:', error);
       toast.error('Error al eliminar la promoción');
     }
   };
 
   const handleImageError = (e) => {
-    e.target.style.display = 'none';
-    const placeholder = e.target.nextElementSibling;
-    if (placeholder) {
-      placeholder.style.display = 'flex';
-    }
+    e.target.src = '/placeholder-image.jpg';
   };
 
   if (loading) {
@@ -183,16 +185,42 @@ const Promotions = () => {
               </div>
 
               <div className="mb-4">
-                <label className="block mb-1">Válido hasta</label>
+                <label className="block mb-1">Fecha de inicio</label>
                 <input
                   type="date"
-                  name="validUntil"
-                  data-testid="promotion-valid-until"
-                  value={formData.validUntil}
+                  name="startDate"
+                  data-testid="promotion-start-date"
+                  value={formData.startDate}
                   onChange={handleInputChange}
                   className="w-full border rounded px-3 py-2"
                 />
-                {errors.validUntil && <p className="text-red-500 text-sm mt-1">{errors.validUntil}</p>}
+                {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1">Fecha de fin</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  data-testid="promotion-end-date"
+                  value={formData.endDate}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.endDate && <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1">Descuento</label>
+                <input
+                  type="text"
+                  name="discount"
+                  data-testid="promotion-discount"
+                  value={formData.discount}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.discount && <p className="text-red-500 text-sm mt-1">{errors.discount}</p>}
               </div>
 
               <div className="mb-4">
@@ -233,29 +261,43 @@ const Promotions = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promotions.map(promotion => (
-            <div key={promotion.id} className="promotion-card border rounded-lg overflow-hidden">
-              <div className="relative aspect-video">
-                <img
-                  src={`http://localhost:8000${promotion.image_url}`}
+            <div key={promotion.id} className="promotion-card border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="relative w-full h-48">
+                
+                {promotion.image ? (<img
+                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/uploads/${promotion.image.split('/').pop()}`}
                   alt={promotion.title}
                   className="w-full h-full object-cover"
-                  onError={handleImageError}
-                />
-                <div className="image-placeholder hidden absolute inset-0 bg-gray-200 flex items-center justify-center">
+                  onError={(e) => {
+                    e.target.src = './public/uploads/image-not-found.jpg';
+                  }}
+                />) : (<div className="absolute inset-0 bg-gray-200 flex items-center justify-center hidden">
                   <span className="text-gray-500">Image not available</span>
-                </div>
+                </div>)}
+              
+                
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{promotion.title}</h3>
-                <p className="text-gray-600 mb-2">{promotion.description}</p>
-                <p className="text-sm text-gray-500">
-                  Válido hasta: {format(new Date(promotion.valid_until), 'dd/MM/yyyy')}
-                </p>
+              <div className="p-4 space-y-2">
+                <h3 className="font-bold text-lg text-gray-800">{promotion.title}</h3>
+                <p className="text-gray-600 line-clamp-2">{promotion.description}</p>
+                <div className="space-y-1">
+                  {promotion.startDate && (<p className="text-sm text-gray-500 flex items-center">
+                    <span className="font-medium">Válido desde:</span>
+                    <span className="ml-2">{formatDate(promotion.startDate)}</span>
+                  </p>)}
+                  {promotion.endDate && (<p className="text-sm text-gray-500 flex items-center">
+                    <span className="font-medium">Válido hasta:</span>
+                    <span className="ml-2">{formatDate(promotion.endDate)}</span>
+                  </p>)}  
+                </div>
                 <button
                   data-testid="delete-promotion"
                   onClick={() => setShowDeleteConfirm(promotion.id)}
-                  className="mt-2 text-red-500 hover:text-red-600"
+                  className="mt-4 text-red-500 hover:text-red-600 transition-colors flex items-center"
                 >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
                   Eliminar
                 </button>
               </div>

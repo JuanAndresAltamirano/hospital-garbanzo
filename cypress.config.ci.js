@@ -15,6 +15,6 @@ export default defineConfig({
     },
   },
   env: {
-    apiUrl: 'http://localhost:8000',
+    apiUrl: 'http://localhost:3001',
   },
 }); 

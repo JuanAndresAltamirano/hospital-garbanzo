@@ -50,6 +50,10 @@ body {
   margin-top: 70px;
 }
 
+.main-content.admin-page {
+  margin-top: 0;
+}
+
 .section {
   padding: calc(var(--spacing-unit) * 4) 0;
 }

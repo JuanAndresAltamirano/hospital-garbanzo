@@ -1,45 +1,52 @@
+import { useState, useEffect } from 'react';
 import { FaStethoscope, FaAmbulance, FaFlask, FaXRay, FaBaby, FaFemale } from 'react-icons/fa';
+import { apiService } from '../services/apiService';
+import { toast } from 'react-toastify';
 import './Services.css';
 
 const Services = () => {
-  const services = [
-    {
-      title: 'Consulta General',
-      description: 'Atención médica general para diagnóstico y tratamiento de condiciones comunes.',
-      image: 'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?auto=format&fit=crop&q=80',
-      icon: <FaStethoscope />
-    },
-    {
-      title: 'Emergencias 24/7',
-      description: 'Servicio de emergencias disponible las 24 horas, todos los días de la semana.',
-      image: 'https://images.unsplash.com/photo-1587746746439-977c9d6be54a?auto=format&fit=crop&q=80',
-      icon: <FaAmbulance />
-    },
-    {
-      title: 'Laboratorio Clínico',
-      description: 'Análisis clínicos con resultados precisos y rápidos.',
-      image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80',
-      icon: <FaFlask />
-    },
-    {
-      title: 'Radiología',
-      description: 'Servicios de diagnóstico por imagen con tecnología moderna.',
-      image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80',
-      icon: <FaXRay />
-    },
-    {
-      title: 'Pediatría',
-      description: 'Atención especializada para niños y adolescentes.',
-      image: 'https://images.unsplash.com/photo-1666214280533-b9c78f563421?auto=format&fit=crop&q=80',
-      icon: <FaBaby />
-    },
-    {
-      title: 'Ginecología',
-      description: 'Atención integral para la salud de la mujer.',
-      image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80',
-      icon: <FaFemale />
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const response = await apiService.get('/services');
+      setServices(response.data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      toast.error('Error al cargar los servicios');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const getIcon = (iconName) => {
+    const icons = {
+      'stethoscope': <FaStethoscope />,
+      'ambulance': <FaAmbulance />,
+      'flask': <FaFlask />,
+      'xray': <FaXRay />,
+      'baby': <FaBaby />,
+      'female': <FaFemale />
+    };
+    return icons[iconName] || <FaStethoscope />;
+  };
+
+  if (loading) {
+    return (
+      <div className="services-page">
+        <div className="services-hero">
+          <div className="container">
+            <h1>Cargando servicios...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="services-page">
@@ -54,13 +61,21 @@ const Services = () => {
       
       <div className="container">
         <div className="services-grid">
-          {services.map((service, index) => (
-            <div key={index} className="service-card card">
+          {services.map((service) => (
+            <div key={service.id} className="service-card card">
               <div className="service-icon">
-                {service.icon}
+                {getIcon(service.icon)}
               </div>
               <div className="service-image">
-                <img src={service.image} alt={service.title} />
+                {service.image && (
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    onError={(e) => {
+                      e.target.src = './public/uploads/image-not-found.jpg';
+                    }}
+                  />
+                )}
               </div>
               <div className="service-content">
                 <h3>{service.title}</h3>

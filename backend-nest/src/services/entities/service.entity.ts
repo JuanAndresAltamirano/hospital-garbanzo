@@ -20,6 +20,9 @@ export class Service {
   @Column({ nullable: true })
   image: string;
 
+  @Column({ default: 'stethoscope' })
+  icon: string;
+
   @Column({ default: 0 })
   displayOrder: number;
 

@@ -1,4 +1,37 @@
-import { IsString, IsNumber, IsOptional, Min, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, MaxLength, MinLength, IsIn } from 'class-validator';
+
+const VALID_ICONS = [
+  'stethoscope',
+  'ambulance',
+  'flask',
+  'xray',
+  'baby',
+  'female',
+  'doctor',
+  'hospital',
+  'heartbeat',
+  'bandaid',
+  'pills',
+  'syringe',
+  'wheelchair',
+  'teeth',
+  'lungs',
+  'brain',
+  'eye',
+  'notes',
+  'clinic',
+  'firstaid',
+  'vial',
+  'microscope',
+  'dna',
+  'book',
+  'patient',
+  'nurse',
+  'bed',
+  'virus',
+  'disease',
+  'thermometer'
+] as const;
 
 export class CreateServiceDto {
   @IsString()
@@ -22,4 +55,8 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString()
   image?: string;
+
+  @IsString()
+  @IsIn(VALID_ICONS, { message: 'Invalid icon selected' })
+  icon: string;
 } 

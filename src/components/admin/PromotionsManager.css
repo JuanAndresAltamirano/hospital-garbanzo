@@ -47,8 +47,8 @@
 }
 
 .promotion-image {
-  width: 120px;
-  height: 80px;
+  /*width: 120px; */
+  /*height: 80px;*/
   overflow: hidden;
   border-radius: var(--border-radius);
   flex-shrink: 0;

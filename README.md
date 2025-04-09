@@ -35,6 +35,29 @@ docker-compose up -d
 # The initialization script is in database/init.sql
 ```
 
+## Booting the Project
+
+To boot the project, follow these steps:
+
+1. **Start the Backend Server**
+   
+   Navigate to the backend directory and start the NestJS server:
+   ```bash
+   cd backend-nest
+   npm install  # Install dependencies if not already installed
+   npm run start:dev  # Start the NestJS server in development mode
+   ```
+
+2. **Start the Frontend Development Server**
+
+   Ensure you are in the root directory of the project and run:
+   ```bash
+   npm install  # Install dependencies if not already installed
+   npm run dev  # Start the frontend server
+   ```
+
+This will start both the backend and frontend servers, allowing you to access the application in your browser.
+
 ## Running Tests
 
 The project includes a comprehensive test suite that covers:

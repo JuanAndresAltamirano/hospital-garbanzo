@@ -1,16 +1,85 @@
 import { useState } from 'react';
+import {
+  FaStethoscope,
+  FaAmbulance,
+  FaFlask,
+  FaXRay,
+  FaBaby,
+  FaFemale,
+  FaUserMd,
+  FaHospital,
+  FaHeartbeat,
+  FaBandAid,
+  FaPills,
+  FaSyringe,
+  FaWheelchair,
+  FaTeeth,
+  FaLungs,
+  FaBrain,
+  FaEye,
+  FaNotesMedical,
+  FaClinicMedical,
+  FaFirstAid,
+  FaVial,
+  FaMicroscope,
+  FaDna,
+  FaBookMedical,
+  FaHospitalUser,
+  FaUserNurse,
+  FaProcedures,
+  FaDisease,
+  FaVirus,
+  FaThermometer,
+  FaThList,
+  FaGripHorizontal
+} from 'react-icons/fa';
 import './ServiceForm.css';
 
 const ServiceForm = ({ service, onSubmit, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showGrid, setShowGrid] = useState(false);
   const [formData, setFormData] = useState({
     name: service?.name || '',
     description: service?.description || '',
     price: service?.price || '',
     duration: service?.duration || '',
     image: null,
+    icon: service?.icon || ''
   });
+
+  const iconOptions = {
+    'stethoscope': { icon: <FaStethoscope />, label: 'Medicina General' },
+    'ambulance': { icon: <FaAmbulance />, label: 'Servicios de Emergencia' },
+    'flask': { icon: <FaFlask />, label: 'Laboratorio' },
+    'xray': { icon: <FaXRay />, label: 'Radiología' },
+    'baby': { icon: <FaBaby />, label: 'Pediatría' },
+    'female': { icon: <FaFemale />, label: 'Ginecología' },
+    'doctor': { icon: <FaUserMd />, label: 'Especialistas' },
+    'hospital': { icon: <FaHospital />, label: 'Servicios Hospitalarios' },
+    'heartbeat': { icon: <FaHeartbeat />, label: 'Cardiología' },
+    'bandaid': { icon: <FaBandAid />, label: 'Procedimientos Menores' },
+    'pills': { icon: <FaPills />, label: 'Farmacia' },
+    'syringe': { icon: <FaSyringe />, label: 'Vacunación' },
+    'wheelchair': { icon: <FaWheelchair />, label: 'Terapia Física' },
+    'teeth': { icon: <FaTeeth />, label: 'Odontología' },
+    'lungs': { icon: <FaLungs />, label: 'Neumología' },
+    'brain': { icon: <FaBrain />, label: 'Neurología' },
+    'eye': { icon: <FaEye />, label: 'Oftalmología' },
+    'notes': { icon: <FaNotesMedical />, label: 'Historial Médico' },
+    'clinic': { icon: <FaClinicMedical />, label: 'Consulta Externa' },
+    'firstaid': { icon: <FaFirstAid />, label: 'Primeros Auxilios' },
+    'vial': { icon: <FaVial />, label: 'Análisis de Sangre' },
+    'microscope': { icon: <FaMicroscope />, label: 'Análisis de Laboratorio' },
+    'dna': { icon: <FaDna />, label: 'Pruebas Genéticas' },
+    'book': { icon: <FaBookMedical />, label: 'Educación Médica' },
+    'patient': { icon: <FaHospitalUser />, label: 'Atención al Paciente' },
+    'nurse': { icon: <FaUserNurse />, label: 'Enfermería' },
+    'bed': { icon: <FaProcedures />, label: 'Hospitalización' },
+    'virus': { icon: <FaVirus />, label: 'Enfermedades Infecciosas' },
+    'disease': { icon: <FaDisease />, label: 'Enfermedades Generales' },
+    'thermometer': { icon: <FaThermometer />, label: 'Clínica de Fiebre' }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -39,6 +108,11 @@ const ServiceForm = ({ service, onSubmit, onClose }) => {
     if (!service && !formData.image) {
       newErrors.image = 'Image is required for new services';
     }
+
+    // Icon validation
+    if (!formData.icon) {
+      newErrors.icon = 'Please select an icon';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -61,6 +135,7 @@ const ServiceForm = ({ service, onSubmit, onClose }) => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('price', formData.price);
       formDataToSend.append('duration', formData.duration);
+      formDataToSend.append('icon', formData.icon);
       
       // Only append image if it exists
       if (formData.image) {
@@ -84,6 +159,54 @@ const ServiceForm = ({ service, onSubmit, onClose }) => {
       }));
     }
   };
+
+  const handleIconSelect = (iconKey) => {
+    setFormData(prev => ({
+      ...prev,
+      icon: iconKey
+    }));
+  };
+
+  const renderIconGrid = () => (
+    <div className="icon-grid">
+      {Object.entries(iconOptions).map(([key, { icon, label }]) => (
+        <button
+          key={key}
+          type="button"
+          className={`icon-grid-item ${formData.icon === key ? 'selected' : ''}`}
+          onClick={() => handleIconSelect(key)}
+          disabled={loading}
+        >
+          <div className="icon-wrapper">{icon}</div>
+          <span className="icon-label">{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  const renderIconSelect = () => (
+    <div className="icon-select-wrapper">
+      <select
+        id="icon"
+        value={formData.icon}
+        onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+        disabled={loading}
+        required
+      >
+        <option value="">Seleccionar departamento</option>
+        {Object.entries(iconOptions).map(([value, { icon, label }]) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+      {formData.icon && (
+        <div className="selected-icon">
+          {iconOptions[formData.icon]?.icon}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="service-form">
@@ -141,6 +264,23 @@ const ServiceForm = ({ service, onSubmit, onClose }) => {
           required
         />
         {errors.duration && <div className="error-message">{errors.duration}</div>}
+      </div>
+
+      <div className="form-group">
+        <div className="icon-section-header">
+          <label htmlFor="icon">Ícono del Departamento <span className="required">*</span></label>
+          <button
+            type="button"
+            className="view-toggle-btn"
+            onClick={() => setShowGrid(!showGrid)}
+            disabled={loading}
+          >
+            {showGrid ? <FaThList /> : <FaGripHorizontal />}
+            <span>{showGrid ? 'Vista Lista' : 'Vista Cuadrícula'}</span>
+          </button>
+        </div>
+        {showGrid ? renderIconGrid() : renderIconSelect()}
+        {errors.icon && <div className="error-message">{errors.icon}</div>}
       </div>
 
       <div className="form-group">

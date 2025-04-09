@@ -19,7 +19,23 @@ export class FileUploadService {
     const fileName = `${crypto.randomBytes(16).toString('hex')}${path.extname(file.originalname)}`;
     const filePath = path.join(this.uploadDir, fileName);
     
-    await fs.promises.writeFile(filePath, file.buffer);
+    console.log('Uploading file:', file.originalname);
+    console.log('File size:', file.size);
+    console.log('Destination path:', filePath);
+
+    try {
+      // Ensure directory exists
+      if (!fs.existsSync(this.uploadDir)) {
+        fs.mkdirSync(this.uploadDir, { recursive: true });
+      }
+
+      await fs.promises.writeFile(filePath, file.buffer);
+      console.log('File uploaded successfully');
+    } catch (error) {
+      console.error('Error writing file:', error);
+      throw new Error('Failed to upload file');
+    }
+
     return fileName;
   }
 

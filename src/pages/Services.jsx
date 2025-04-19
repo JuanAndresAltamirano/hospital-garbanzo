@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   FaStethoscope,
   FaAmbulance,
@@ -32,22 +34,58 @@ import {
   FaThermometer,
   FaCheck
 } from 'react-icons/fa';
-import { apiService } from '../services/apiService';
-import { toast } from 'react-toastify';
+import { servicesService } from '../services/servicesService';
 import './Services.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const servicesRef = useRef(null);
+  const navigate = useNavigate();
+  
+  // Get unique categories from services
+  const getCategories = () => {
+    const categories = services.map(service => service.category);
+    return ['all', ...new Set(categories)].filter(Boolean);
+  };
 
   useEffect(() => {
     fetchServices();
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    const serviceCards = document.querySelectorAll('.service-card');
+    serviceCards.forEach((card) => {
+      observer.observe(card);
+    });
+
+    return () => {
+      serviceCards.forEach((card) => {
+        observer.unobserve(card);
+      });
+    };
+  }, [services]);
+
   const fetchServices = async () => {
     try {
-      const response = await apiService.get('/services');
-      setServices(response.data);
+      const data = await servicesService.getAll();
+      // Sort by name
+      const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+      setServices(sortedData);
     } catch (error) {
       console.error('Error fetching services:', error);
       toast.error('Error al cargar los servicios');
@@ -58,55 +96,63 @@ const Services = () => {
 
   const getIcon = (iconName) => {
     const icons = {
-      'stethoscope': <FaStethoscope />,          // General Medicine/Cardiology
-      'ambulance': <FaAmbulance />,              // Emergency Services
-      'flask': <FaFlask />,                      // Laboratory
-      'xray': <FaXRay />,                        // Radiology
-      'baby': <FaBaby />,                        // Pediatrics
-      'female': <FaFemale />,                    // Gynecology
-      'doctor': <FaUserMd />,                    // Doctors/Specialists
-      'hospital': <FaHospital />,                // General Hospital Services
-      'heartbeat': <FaHeartbeat />,              // Cardiology
-      'bandaid': <FaBandAid />,                  // Minor Procedures/First Aid
-      'pills': <FaPills />,                      // Pharmacy
-      'syringe': <FaSyringe />,                  // Vaccinations/Injections
-      'wheelchair': <FaWheelchair />,            // Physical Therapy/Mobility
-      'teeth': <FaTeeth />,                      // Dental
-      'lungs': <FaLungs />,                      // Pulmonology
-      'brain': <FaBrain />,                      // Neurology
-      'eye': <FaEye />,                          // Ophthalmology
-      'notes': <FaNotesMedical />,               // Medical Records
-      'clinic': <FaClinicMedical />,             // Outpatient Services
-      'firstaid': <FaFirstAid />,                // Emergency Care
-      'vial': <FaVial />,                        // Blood Tests
-      'microscope': <FaMicroscope />,            // Laboratory Analysis
-      'dna': <FaDna />,                          // Genetic Testing
-      'book': <FaBookMedical />,                 // Medical Education
-      'patient': <FaHospitalUser />,             // Patient Care
-      'nurse': <FaUserNurse />,                  // Nursing Services
-      'bed': <FaProcedures />,                   // Inpatient Services
-      'virus': <FaVirus />,                      // Infectious Diseases
-      'disease': <FaDisease />,                  // General Diseases
-      'thermometer': <FaThermometer />           // Temperature/Fever Clinic
+      'stethoscope': <FaStethoscope />,
+      'ambulance': <FaAmbulance />,
+      'flask': <FaFlask />,
+      'xray': <FaXRay />,
+      'baby': <FaBaby />,
+      'female': <FaFemale />,
+      'doctor': <FaUserMd />,
+      'hospital': <FaHospital />,
+      'heartbeat': <FaHeartbeat />,
+      'bandaid': <FaBandAid />,
+      'pills': <FaPills />,
+      'syringe': <FaSyringe />,
+      'wheelchair': <FaWheelchair />,
+      'teeth': <FaTeeth />,
+      'lungs': <FaLungs />,
+      'brain': <FaBrain />,
+      'eye': <FaEye />,
+      'notes': <FaNotesMedical />,
+      'clinic': <FaClinicMedical />,
+      'firstaid': <FaFirstAid />,
+      'vial': <FaVial />,
+      'microscope': <FaMicroscope />,
+      'dna': <FaDna />,
+      'book': <FaBookMedical />,
+      'patient': <FaHospitalUser />,
+      'nurse': <FaUserNurse />,
+      'bed': <FaProcedures />,
+      'virus': <FaVirus />,
+      'disease': <FaDisease />,
+      'thermometer': <FaThermometer />
     };
     return icons[iconName] || <FaStethoscope />;
   };
 
+  const filteredServices = activeCategory === 'all' 
+    ? services 
+    : services.filter(service => service.category === activeCategory);
+
+  const handleServiceDetails = (serviceId) => {
+    navigate(`/services/${serviceId}`);
+  };
+
   if (loading) {
     return (
-      <div className="services-page">
-        <div className="services-hero">
-          <div className="container">
-            <h1>Nuestros Servicios</h1>
-            <div className="loading-banner">Cargando servicios...</div>
-          </div>
+      <div className="services-loading">
+        <div className="services-spinner">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" />
+          </svg>
         </div>
+        <p>Cargando nuestros servicios...</p>
       </div>
     );
   }
 
   return (
-    <div className="services-page">
+    <div className="services-component" ref={servicesRef}>
       <div className="services-hero">
         <div className="container">
           <h1>Nuestros Servicios</h1>
@@ -115,36 +161,76 @@ const Services = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="container">
-        <h2 className="section-title">Servicios Médicos Especializados</h2>
-        <div className="services-grid">
-          {services.map((service) => (
-            <div key={service.id} className="service-card">
-              <div className="service-icon">
-                {getIcon(service.icon)}
-              </div>
-              <div className="service-image">
-                {service.image && (
-                  <img
-                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/uploads/${service.image}`}
-                    alt={service.name}
-                    onError={(e) => {
-                      e.target.src = '/placeholder-medical.jpg';
-                    }}
-                  />
-                )}
-              </div>
-              <div className="service-content">
-                <h3>{service.name}</h3>
-                <p>{service.description}</p>
-                <button className="service-btn">
-                  Más Información
-                </button>
-              </div>
+        {services.length === 0 ? (
+          <div className="services-empty">
+            <div className="services-empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12" y2="16"></line>
+              </svg>
             </div>
-          ))}
-        </div>
+            <h3>Aún no hay servicios disponibles</h3>
+            <p>Pronto publicaremos información sobre nuestros servicios médicos.</p>
+          </div>
+        ) : (
+          <>
+            {getCategories().length > 1 && (
+              <div className="services-filter">
+                {getCategories().map(category => (
+                  <button 
+                    key={category} 
+                    className={`filter-btn ${activeCategory === category ? 'active' : ''}`}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category === 'all' ? 'Todos' : category}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="services-grid">
+              {filteredServices.map((service) => (
+                <div 
+                  className="service-card" 
+                  key={service.id}
+                  data-category={service.category}
+                >
+                  <div className="service-icon">
+                    {getIcon(service.icon)}
+                  </div>
+                  
+                  {service.image && (
+                    <div className="service-image">
+                      <img
+                        src={`${API_URL}/uploads/${service.image}`}
+                        alt={service.name}
+                        onError={(e) => {
+                          e.target.src = '/placeholder-medical.jpg';
+                        }}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="service-content">
+                    <h3>{service.name}</h3>
+                   {/* <p>{service.description}</p> */}
+                    
+                    <button 
+                      className="service-btn"
+                      onClick={() => handleServiceDetails(service.id)}
+                    >
+                      Más Información
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <section className="why-choose-us">
           <h2>¿Por qué elegirnos?</h2>
@@ -153,16 +239,18 @@ const Services = () => {
               <div className="feature-icon">
                 <FaUserMd />
               </div>
-              <h4>Experiencia</h4>
+              <h4>Experiencia Médica</h4>
               <p>Más de 25 años brindando servicios de salud de calidad con profesionales altamente calificados.</p>
             </div>
+            
             <div className="feature">
               <div className="feature-icon">
                 <FaMicroscope />
               </div>
-              <h4>Tecnología</h4>
+              <h4>Tecnología Avanzada</h4>
               <p>Equipamiento médico de última generación para diagnósticos precisos y tratamientos efectivos.</p>
             </div>
+            
             <div className="feature">
               <div className="feature-icon">
                 <FaCheck />
@@ -170,6 +258,7 @@ const Services = () => {
               <h4>Calidad Certificada</h4>
               <p>Contamos con certificaciones que avalan la calidad y seguridad de nuestros servicios.</p>
             </div>
+            
             <div className="feature">
               <div className="feature-icon">
                 <FaAmbulance />

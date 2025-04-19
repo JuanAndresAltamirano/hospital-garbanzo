@@ -1,0 +1,162 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { FaArrowLeft, FaCalendarAlt, FaClock, FaTag } from 'react-icons/fa';
+import { servicesService } from '../services/servicesService';
+import './ServiceDetail.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const ServiceDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        setLoading(true);
+        const data = await servicesService.getById(id);
+        setService(data);
+      } catch (err) {
+        console.error('Error fetching service:', err);
+        setError('No pudimos cargar la información del servicio.');
+        toast.error('Error al cargar la información del servicio');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchService();
+    }
+  }, [id]);
+
+  const handleBack = () => {
+    navigate('/services');
+  };
+
+  if (loading) {
+    return (
+      <div className="service-detail-loading">
+        <div className="service-detail-spinner">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" />
+          </svg>
+        </div>
+        <p>Cargando información del servicio...</p>
+      </div>
+    );
+  }
+
+  if (error || !service) {
+    return (
+      <div className="service-detail-error">
+        <h2>Lo sentimos</h2>
+        <p>{error || 'No se encontró el servicio solicitado.'}</p>
+        <button className="back-button" onClick={handleBack}>
+          <FaArrowLeft /> Volver a servicios
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="service-detail-container">
+      <div className="service-detail-header">
+        <div className="container">
+          <button className="back-button" onClick={handleBack}>
+            <FaArrowLeft /> Volver a servicios
+          </button>
+          <h1>{service.name}</h1>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="service-detail-content">
+          <div className="service-detail-main">
+            <div className="service-detail-image">
+              {service.image ? (
+                <img
+                  src={`${API_URL}/${service.image}`}
+                  alt={service.name}
+                  onError={(e) => {
+                    e.target.src = '/placeholder-medical.jpg';
+                  }}
+                />
+              ) : (
+                <div className="service-placeholder-image">
+                  <span>Imagen no disponible</span>
+                </div>
+              )}
+            </div>
+
+            <div className="service-detail-info">
+              <h2>Descripción</h2>
+              <p className="service-detail-description">{service.description}</p>
+              
+              {/* <div className="service-meta">
+                {service.price > 0 && (
+                  <div className="service-meta-item">
+                    <FaTag />
+                    <span>Precio desde:</span>
+                    <strong>${parseFloat(service.price).toFixed(2)}</strong>
+                  </div>
+                )}
+                
+                {service.duration > 0 && (
+                  <div className="service-meta-item">
+                    <FaClock />
+                    <span>Duración aproximada:</span>
+                    <strong>{service.duration} minutos</strong>
+                  </div>
+                )}
+              </div> */}
+              
+             {/* <button className="appointment-button">
+                <FaCalendarAlt /> Agendar Cita
+              </button> */}
+            </div>
+          </div>
+          
+          <div className="service-detail-additional">
+            <div className="service-benefits">
+              <h3>Beneficios</h3>
+              <ul>
+                <li>Atención médica con profesionales especializados</li>
+                <li>Tecnología de vanguardia para mejores resultados</li>
+                <li>Instalaciones modernas y confortables</li>
+                <li>Seguimiento personalizado</li>
+              </ul>
+            </div>
+            
+            <div className="service-faq">
+              <h3>Preguntas Frecuentes</h3>
+              <div className="faq-item">
+                <h4>¿Necesito preparación previa?</h4>
+                <p>Cada servicio puede requerir una preparación específica. Al agendar su cita, nuestro personal le proporcionará toda la información necesaria.</p>
+              </div>
+              <div className="faq-item">
+                <h4>¿Puedo usar mi seguro médico?</h4>
+                <p>Trabajamos con las principales aseguradoras. Consulte sobre las coberturas específicas para este servicio.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="service-cta">
+            <h3>¿Necesita más información?</h3>
+            <p>Contáctenos directamente y resolveremos todas sus dudas.</p>
+            <div className="cta-buttons">
+              <a href="/contact" className="contact-button">Contactar</a>
+              <a href="tel:+123456789" className="phone-button">Llamar Ahora</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ServiceDetail; 

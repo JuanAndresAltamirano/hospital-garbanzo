@@ -5,9 +5,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/layout/Header';
 import Home from './pages/Home';
 import Services from './pages/Services';
+import ServiceDetail from './pages/ServiceDetail';
 import Specialists from './pages/Specialists';
 import History from './pages/History';
 import Promotions from './pages/Promotions';
+import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import PasswordRecovery from './pages/PasswordRecovery';
 import PasswordReset from './pages/PasswordReset';
@@ -24,9 +26,11 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/:id" element={<ServiceDetail />} />
           <Route path="/specialists" element={<Specialists />} />
           <Route path="/history" element={<History />} />
           <Route path="/promotions" element={<Promotions />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/admin/*" element={<Admin />} />
           <Route path="/forgot-password" element={<PasswordRecovery />} />
           <Route path="/reset-password" element={<PasswordReset />} />

@@ -83,65 +83,58 @@ const PromotionCarousel = ({ promotions }) => {
               
               return (
                 <div key={promotion.id} className="carousel-slide">
-                  <div className={`promotion-card ${index === currentIndex ? 'active' : ''}`}>
-                    <div className="promotion-card-inner">
-                      <div className="promotion-card-content">
-                        <div className="promotion-label">
-                          <FaTag />
-                          <span>Promoción Especial</span>
-                        </div>
-                        
-                        <div className="promotion-header">
-                          <h3>{promotion.title}</h3>
-                          {promotion.discount && (
-                            <div className="discount-badge">
-                              <FaPercentage /> {promotion.discount}% descuento
-                            </div>
-                          )}
-                        </div>
-                        
-                        <p className="promotion-description">{promotion.description}</p>
-                        
-                        {remainingDays !== null && remainingDays <= 7 && (
-                          <div className="expiring-soon">
-                            <FaClock />
-                            <span>¡Termina pronto! Solo {remainingDays} {remainingDays === 1 ? 'día' : 'días'} restantes</span>
-                          </div>
-                        )}
-                        
-                        <div className="promotion-dates">
-                          <div className="date-item">
-                            <FaCalendarAlt />
-                            <span>Desde: {formatDate(promotion.startDate)}</span>
-                          </div>
-                          <div className="date-item">
-                            <FaCalendarAlt />
-                            <span>Hasta: {formatDate(promotion.endDate)}</span>
-                          </div>
-                          <div className="date-item service-item">
-                            <FaHospital />
-                            <span>Servicio: {promotion.service || 'Consulta general'}</span>
-                          </div>
-                        </div>
-                        
-                        <button className="learn-more-btn">
-                          Más Información <FaArrowRight />
-                        </button>
+                  <div className="promotion-card-inner">
+                    <div className="promotion-card-content">
+                      <div className="promotion-label">
+                        <FaTag />
+                        <span>Promoción Especial</span>
                       </div>
-                      <div className="promotion-image">
-                        <img 
-                          src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/uploads/${promotion.image}`}
-                          alt={promotion.title}
-                          onError={(e) => {
-                            e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
-                          }}
-                        />
-                        {promotion.discount && (
-                          <div className="corner-ribbon">
-                            {promotion.discount}% OFF
-                          </div>
-                        )}
+                      
+                      <div className="promotion-header">
+                        <h3>{promotion.title}</h3>
                       </div>
+                      
+                      <p className="promotion-description">{promotion.description}</p>
+                      
+                      {remainingDays !== null && remainingDays <= 7 && (
+                        <div className="expiring-soon">
+                          <FaClock />
+                          <span>¡Termina pronto! Solo {remainingDays} {remainingDays === 1 ? 'día' : 'días'} restantes</span>
+                        </div>
+                      )}
+                      
+                      <div className="promotion-dates">
+                        <div className="date-item">
+                          <FaCalendarAlt />
+                          <span>Desde: {formatDate(promotion.startDate)}</span>
+                        </div>
+                        <div className="date-item">
+                          <FaCalendarAlt />
+                          <span>Hasta: {formatDate(promotion.endDate)}</span>
+                        </div>
+                        <div className="date-item service-item">
+                          <FaHospital />
+                          <span>Servicio: {promotion.service || 'Consulta general'}</span>
+                        </div>
+                      </div>
+                      
+                      <button className="learn-more-btn">
+                        Más Información <FaArrowRight />
+                      </button>
+                    </div>
+                    <div className="promotion-image">
+                      <img 
+                        src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/uploads/${promotion.image}`}
+                        alt={promotion.title}
+                        onError={(e) => {
+                          e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
+                        }}
+                      />
+                      {promotion.discount && (
+                        <div className="corner-ribbon">
+                          {Math.round(promotion.discount)}% OFF
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -149,7 +142,7 @@ const PromotionCarousel = ({ promotions }) => {
             })}
           </div>
         </div>
-        
+
         <button className="carousel-button prev" onClick={goToPrevious} aria-label="Promoción anterior" disabled={isAnimating}>
           <FaChevronLeft />
         </button>
@@ -157,33 +150,16 @@ const PromotionCarousel = ({ promotions }) => {
           <FaChevronRight />
         </button>
         
-        <div className="carousel-navigation">
-          <div className="carousel-dots">
-            {promotions.map((_, index) => (
-              <button
-                key={index}
-                className={`dot ${index === currentIndex ? 'active' : ''}`}
-                onClick={() => goToSlide(index)}
-                aria-label={`Ir a promoción ${index + 1}`}
-                disabled={isAnimating}
-              />
-            ))}
-          </div>
-          
-          <div className="slide-progress">
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${(100 / promotions.length) * (currentIndex + 1)}%`
-              }}
-            ></div>
-          </div>
-          
-          <div className="slide-counter">
-            <span className="current">{currentIndex + 1}</span>
-            <span className="separator">/</span>
-            <span className="total">{promotions.length}</span>
-          </div>
+        <div className="carousel-dots">
+          {promotions.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentIndex ? 'active' : ''}`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Ir a promoción ${index + 1}`}
+              disabled={isAnimating}
+            />
+          ))}
         </div>
       </div>
     </section>

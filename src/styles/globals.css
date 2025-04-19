@@ -1,6 +1,8 @@
 :root {
   --primary-color: #E31837;  /* A more professional red */
   --primary-light: #ff4d6a;
+  --primary-blue: #2c5282; /* Primary blue from home page */
+  --primary-red: #e53e3e; /* Primary red from home page */
   --secondary-color: #FFFFFF;
   --text-color: #2C3E50;
   --background-light: #F8F9FA;

@@ -14,11 +14,10 @@ const Header = () => {
         <nav className="nav-links">
           <Link to="/">Inicio</Link>
           <Link to="/services">Servicios</Link>
-          <Link to="/specialists">Especialistas</Link>
-          <Link to="/history">Historia</Link>
-          <Link to="/promotions">Promociones</Link>
+          <Link to="/history">Sobre Nosotros</Link>
           <Link to="/contact">Contacto</Link>
         </nav>
+        {/*
         <div className="auth-buttons">
           {isAuthenticated ? (
             <>
@@ -34,6 +33,7 @@ const Header = () => {
             <Link to="/login" className="login-btn">Iniciar Sesión</Link>
           )}
         </div>
+        */}
       </div>
     </header>
   );

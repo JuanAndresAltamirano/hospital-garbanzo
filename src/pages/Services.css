@@ -12,7 +12,9 @@
   --border-radius: 8px;
 }
 
-.services-page {
+/* Services Page Styles */
+.services-page,
+.services-component {
   padding-top: 0;
   color: var(--text-dark);
 }
@@ -70,6 +72,114 @@
   margin: 15px auto 0;
 }
 
+/* Loading Animation */
+.services-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.services-spinner {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 1rem;
+  animation: spin 1.2s linear infinite;
+}
+
+.services-spinner svg {
+  width: 100%;
+  height: 100%;
+}
+
+.services-spinner circle {
+  fill: none;
+  stroke: var(--primary-blue);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 150, 200;
+  stroke-dashoffset: -10;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 200; stroke-dashoffset: -125; }
+}
+
+/* Empty State */
+.services-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--background-light);
+  border-radius: var(--border-radius);
+  margin-bottom: 2rem;
+}
+
+.services-empty-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.5rem;
+  color: var(--primary-blue);
+}
+
+.services-empty-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.services-empty h3 {
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.services-empty p {
+  color: var(--text-medium);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Filter Buttons */
+.services-filter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1.25rem;
+  background-color: var(--background-light);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius);
+  color: var(--text-medium);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  background-color: #edf2f7;
+  color: var(--primary-blue);
+}
+
+.filter-btn.active {
+  background-color: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+/* Services Grid */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -87,11 +197,41 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Add animation properties */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease;
+}
+
+.service-card.animate {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .service-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
+}
+
+/* Staggered animation for cards */
+.service-card:nth-child(2) {
+  transition-delay: 0.1s;
+}
+
+.service-card:nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+.service-card:nth-child(4) {
+  transition-delay: 0.3s;
+}
+
+.service-card:nth-child(5) {
+  transition-delay: 0.4s;
+}
+
+.service-card:nth-child(n+6) {
+  transition-delay: 0.5s;
 }
 
 .service-icon {
@@ -108,6 +248,7 @@
   justify-content: center;
   z-index: 1;
   font-size: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .service-image {
@@ -146,6 +287,27 @@
   margin-bottom: 1.5rem;
   line-height: 1.6;
   flex-grow: 1;
+}
+
+/* Service details (price, duration) */
+.service-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.service-price, .service-duration {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--background-light);
+  border-radius: var(--border-radius);
+  color: var(--text-medium);
+}
+
+.service-price span, .service-duration span {
+  color: var(--text-dark);
+  font-weight: 500;
+  margin-right: 0.25rem;
 }
 
 .service-btn {
@@ -257,5 +419,20 @@
   .features-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  
+  .services-filter {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filter-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .service-details {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 } 

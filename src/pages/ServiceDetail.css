@@ -1,0 +1,421 @@
+:root {
+  --primary-blue: #2c5282;
+  --primary-red: #e53e3e;
+  --text-dark: #2d3748;
+  --text-medium: #4a5568;
+  --text-light: #718096;
+  --background-white: #ffffff;
+  --background-light: #f8f9fa;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+}
+
+/* Service Detail Container */
+.service-detail-container {
+  color: var(--text-dark);
+}
+
+/* Service Detail Header */
+.service-detail-header {
+  background: linear-gradient(rgba(44, 82, 130, 0.95), rgba(44, 82, 130, 0.95)),
+              url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 3rem 0 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.service-detail-header h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button svg {
+  margin-right: 0.5rem;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Loading State */
+.service-detail-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.service-detail-spinner {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 1rem;
+  animation: spin 1.2s linear infinite;
+}
+
+.service-detail-spinner svg {
+  width: 100%;
+  height: 100%;
+}
+
+.service-detail-spinner circle {
+  fill: none;
+  stroke: var(--primary-blue);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 150, 200;
+  stroke-dashoffset: -10;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 200; stroke-dashoffset: -125; }
+}
+
+/* Error State */
+.service-detail-error {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.service-detail-error h2 {
+  color: var(--primary-red);
+  margin-bottom: 1rem;
+}
+
+.service-detail-error .back-button {
+  background-color: var(--primary-blue);
+  margin-top: 1.5rem;
+}
+
+/* Main Content */
+.service-detail-content {
+  padding: 0 1rem;
+}
+
+.service-detail-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  background-color: var(--background-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+
+.service-detail-image {
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  height: 400px;
+}
+
+.service-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.service-detail-image img:hover {
+  transform: scale(1.05);
+}
+
+.service-placeholder-image {
+  width: 100%;
+  height: 100%;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-medium);
+}
+
+.service-detail-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-detail-info h2 {
+  color: var(--primary-blue);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.service-detail-info h2:after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-red);
+  margin-top: 8px;
+}
+
+.service-detail-description {
+  color: var(--text-medium);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.service-meta-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--background-light);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  flex: 1;
+  min-width: 200px;
+}
+
+.service-meta-item svg {
+  color: var(--primary-blue);
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.service-meta-item span {
+  color: var(--text-medium);
+  margin-right: 0.5rem;
+}
+
+.service-meta-item strong {
+  color: var(--text-dark);
+}
+
+.appointment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+}
+
+.appointment-button svg {
+  margin-right: 0.5rem;
+}
+
+.appointment-button:hover {
+  background-color: #1a365d;
+}
+
+/* Additional Content */
+.service-detail-additional {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.service-benefits, .service-faq {
+  background-color: var(--background-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+
+.service-benefits h3, .service-faq h3 {
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  position: relative;
+}
+
+.service-benefits h3:after, .service-faq h3:after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary-red);
+  margin-top: 8px;
+}
+
+.service-benefits ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.service-benefits li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--text-medium);
+  position: relative;
+  padding-left: 2rem;
+}
+
+.service-benefits li:last-child {
+  border-bottom: none;
+}
+
+.service-benefits li:before {
+  content: '✓';
+  color: var(--primary-blue);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.faq-item {
+  margin-bottom: 1.5rem;
+}
+
+.faq-item:last-child {
+  margin-bottom: 0;
+}
+
+.faq-item h4 {
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.faq-item p {
+  color: var(--text-medium);
+  line-height: 1.6;
+}
+
+/* Call to Action */
+.service-cta {
+  background: linear-gradient(135deg, var(--primary-blue), #1a365d);
+  color: white;
+  border-radius: var(--border-radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.service-cta h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.service-cta p {
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.contact-button, .phone-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-button {
+  background-color: white;
+  color: var(--primary-blue);
+}
+
+.contact-button:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-3px);
+}
+
+.phone-button {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.phone-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .service-detail-main {
+    grid-template-columns: 1fr;
+  }
+  
+  .service-detail-additional {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-detail-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .service-meta {
+    flex-direction: column;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .service-detail-image {
+    height: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .service-detail-header {
+    padding: 2rem 0 1.5rem;
+  }
+  
+  .service-detail-main,
+  .service-benefits, 
+  .service-faq {
+    padding: 1.5rem;
+  }
+} 

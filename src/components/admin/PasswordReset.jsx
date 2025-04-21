@@ -29,12 +29,19 @@ const PasswordReset = () => {
       return;
     }
 
+    const requestData = {
+      currentPassword: formData.currentPassword,
+      newPassword: formData.newPassword
+    };
+    
+    console.log('Attempting password reset with data structure:', Object.keys(requestData));
+    
     try {
       setLoading(true);
-      await apiService.post('/users/reset-password', {
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword
-      });
+      console.log('Making POST request to /users/reset-password');
+      const response = await apiService.post('/users/reset-password', requestData);
+      console.log('Password reset response:', response.data);
+      
       setSuccess('Password updated successfully');
       setFormData({
         currentPassword: '',
@@ -42,6 +49,9 @@ const PasswordReset = () => {
         confirmPassword: ''
       });
     } catch (err) {
+      console.error('Password reset error:', err);
+      console.error('Error response data:', err.response?.data);
+      console.error('Error status:', err.response?.status);
       setError(err.response?.data?.message || 'Failed to update password');
     } finally {
       setLoading(false);

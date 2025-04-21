@@ -5,6 +5,8 @@ import TimelineForm from './TimelineForm';
 import timelineService from '../../services/timelineService';
 import './TimelineManager.css';
 
+// Get base URL without /api for image loading
+const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const TimelineManager = () => {
@@ -92,6 +94,12 @@ const TimelineManager = () => {
     }
   };
 
+  // Helper function to get the correct image URL
+  const getImageUrl = (imageName) => {
+    if (!imageName) return null;
+    return `${BASE_URL}/uploads/${imageName}`;
+  };
+
   if (loading) {
     return <div className="loading">Cargando...</div>;
   }
@@ -147,13 +155,22 @@ const TimelineManager = () => {
                     >
                       <div className="timeline-content">
                         <div className="timeline-image">
-                          <img
-                            src={`${API_URL}/uploads/${timeline.image}`}
-                            alt={timeline.title}
-                            onError={(e) => {
-                              e.target.src = '/placeholder-image.jpg';
-                            }}
-                          />
+                          {timeline.image ? (
+                            <img
+                              src={getImageUrl(timeline.image)}
+                              alt={timeline.title}
+                              onError={(e) => {
+                                console.error('Image failed to load:', e.target.src);
+                                console.log('Image details:', timeline.image);
+                                e.target.onerror = null; // Prevent infinite loop
+                                e.target.src = '/placeholder-image.jpg';
+                              }}
+                            />
+                          ) : (
+                            <div className="placeholder-image">
+                              <span>No Image</span>
+                            </div>
+                          )}
                         </div>
                         <div className="timeline-details">
                           <div className="timeline-year">{timeline.year}</div>

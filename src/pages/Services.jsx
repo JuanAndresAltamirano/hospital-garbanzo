@@ -37,7 +37,7 @@ import {
 import { servicesService } from '../services/servicesService';
 import './Services.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -205,7 +205,7 @@ const Services = () => {
                   {service.image && (
                     <div className="service-image">
                       <img
-                        src={`${API_URL}/uploads/${service.image}`}
+                        src={`${API_URL.replace('/api', '')}/uploads/${service.image.split('/').pop()}`}
                         alt={service.name}
                         onError={(e) => {
                           e.target.src = '/placeholder-medical.jpg';

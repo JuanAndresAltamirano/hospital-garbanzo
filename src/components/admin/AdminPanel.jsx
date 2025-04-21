@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { FaUsers, FaTag, FaHistory, FaSignOutAlt } from 'react-icons/fa';
+import { FaUsers, FaTag, FaHistory, FaSignOutAlt, FaImages } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PromotionsManager from './PromotionsManager';
 import ServicesManager from './ServicesManager';
 import HistoryManager from './HistoryManager';
+import GalleryManager from './GalleryManager';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -22,6 +23,8 @@ const AdminPanel = () => {
         return <ServicesManager />;
       case 'history':
         return <HistoryManager />;
+      case 'gallery':
+        return <GalleryManager />;
       default:
         return <PromotionsManager />;
     }
@@ -54,6 +57,13 @@ const AdminPanel = () => {
           >
             <FaHistory />
             <span>Historia</span>
+          </button>
+          <button
+            className={`nav-item ${activeSection === 'gallery' ? 'active' : ''}`}
+            onClick={() => setActiveSection('gallery')}
+          >
+            <FaImages />
+            <span>Galería</span>
           </button>
         </nav>
         <div className="admin-footer">

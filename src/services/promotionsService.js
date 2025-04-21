@@ -59,8 +59,8 @@ export const promotionsService = {
     await apiService.delete(`/promotions/${id}`);
   },
 
-  updateOrder: async (orderedIds) => {
-    const response = await apiService.patch('/promotions/reorder', { orderedIds });
+  reorder: async (orderData) => {
+    const response = await apiService.patch('/promotions/reorder', { orderData });
     return response.data;
   }
 }; 

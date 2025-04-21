@@ -11,12 +11,17 @@ import { Promotion } from './promotions/entities/promotion.entity';
 import { SpecialistsModule } from './specialists/specialists.module';
 import { ServicesModule } from './services/services.module';
 import { HistoryModule } from './history/history.module';
+import { GalleryModule } from './gallery/gallery.module';
 import { Service } from './services/entities/service.entity';
 import { Timeline } from './history/entities/timeline.entity';
+import { GalleryCategory } from './gallery/entities/gallery-category.entity';
+import { GalleryImage } from './gallery/entities/gallery-image.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -32,32 +37,13 @@ import { v4 as uuidv4 } from 'uuid';
         username: configService.get('DB_USERNAME') || 'root',
         password: configService.get('DB_PASSWORD') || '',
         database: configService.get('DB_DATABASE') || 'hospital',
-        entities: [User, Promotion, Service, Timeline],
+        entities: [User, Promotion, Service, Timeline, GalleryCategory, GalleryImage],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
-    MulterModule.registerAsync({
-      useFactory: () => ({
-        storage: diskStorage({
-          destination: './uploads',
-          filename: (req, file, callback) => {
-            const uniqueSuffix = uuidv4();
-            const ext = extname(file.originalname);
-            const filename = `${uniqueSuffix}${ext}`;
-            callback(null, filename);
-          },
-        }),
-        fileFilter: (req, file, callback) => {
-          if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return callback(new Error('Only image files are allowed!'), false);
-          }
-          callback(null, true);
-        },
-        limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB
-        },
-      }),
+    MulterModule.register({
+      dest: './uploads',
     }),
     AuthModule,
     UsersModule,
@@ -65,6 +51,7 @@ import { v4 as uuidv4 } from 'uuid';
     SpecialistsModule,
     ServicesModule,
     HistoryModule,
+    GalleryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

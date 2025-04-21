@@ -21,7 +21,7 @@ import ServiceForm from './ServiceForm';
 import { servicesService } from "../../services/servicesService";
 import "./ServicesManager.css";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const SortableItem = ({ id, service, onEdit, onDelete }) => {
   const {
@@ -44,8 +44,11 @@ const SortableItem = ({ id, service, onEdit, onDelete }) => {
       </div>
       <div className="service-image">
         <img
-          src={`${API_URL}/uploads/${service.image.split('/').pop()}`}
+          src={service.image ? `${API_URL.replace('/api', '')}/uploads/${service.image.split('/').pop()}` : '/placeholder-image.jpg'}
           alt={service.name}
+          onError={(e) => {
+            e.target.src = '/placeholder-image.jpg';
+          }}
         />
       </div>
       <div className="service-info">

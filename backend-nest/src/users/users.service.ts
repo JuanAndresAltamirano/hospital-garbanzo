@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+  
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -29,19 +31,40 @@ export class UsersService {
   }
 
   async resetPassword(userId: number, currentPassword: string, newPassword: string): Promise<User> {
+    this.logger.log(`Processing password reset for user ID: ${userId}`);
+    
     const user = await this.findOne(userId);
     if (!user) {
+      this.logger.warn(`User with ID ${userId} not found`);
       throw new UnauthorizedException('User not found');
     }
-
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Current password is incorrect');
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
     
-    return this.usersRepository.save(user);
+    this.logger.debug(`Found user: ${user.username}`);
+    
+    try {
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      this.logger.debug(`Password validation result: ${isPasswordValid}`);
+      
+      if (!isPasswordValid) {
+        this.logger.warn(`Invalid current password for user ID: ${userId}`);
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update the user's password
+      user.password = hashedPassword;
+      
+      // Save the updated user
+      this.logger.debug('Saving updated user password');
+      const result = await this.usersRepository.save(user);
+      this.logger.log(`Password updated successfully for user: ${user.username}`);
+      
+      return result;
+    } catch (error) {
+      this.logger.error(`Error during password reset: ${error.message}`);
+      throw error;
+    }
   }
 } 

@@ -13,13 +13,15 @@ import {
   FaPlus,
   FaInstagram,
   FaFacebook,
-  FaDirections
+  FaDirections,
+  FaImages
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { galleryService } from '../services/galleryService';
 import './Contact.css';
 
-// Gallery configuration - organized by categories/sections
-const hospitalGallery = {
+// Fallback gallery configuration in case the API fails
+const fallbackGallery = {
   title: "Galería de Imágenes",
   subtitle: "Conozca nuestras instalaciones y servicios a través de nuestra galería",
   // Organize photos by category
@@ -36,15 +38,13 @@ const hospitalGallery = {
         },
         {
           src: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80",
-          alt: "Sala de espera"
+          alt: "Sala de espera",
+          caption: "Área de recepción y espera para pacientes"
         },
         {
-          src: "https://images.unsplash.com/photo-1579684288361-5c1a2957cc28?auto=format&fit=crop&q=80",
-          alt: "Recepción"
-        },
-        {
-          src: "https://images.unsplash.com/photo-1512678080530-7760d81faba6?auto=format&fit=crop&q=80",
-          alt: "Pasillo principal"
+          src: "https://images.unsplash.com/photo-1581360742512-021d5b2157d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGhvc3BpdGFsfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+          alt: "Exterior del Hospital",
+          caption: "Vista del exterior del Centro Médico"
         }
       ]
     },
@@ -59,48 +59,21 @@ const hospitalGallery = {
           caption: "Consultorios equipados con tecnología de última generación"
         },
         {
-          src: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80",
-          alt: "Sala de procedimientos"
-        },
-        {
-          src: "https://images.unsplash.com/photo-1666214277657-e60f06e2add3?auto=format&fit=crop&q=80",
-          alt: "Sala de examen"
+          src: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGRvY3RvciUyMG9mZmljZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+          alt: "Sala de examen",
+          caption: "Sala de exámenes médicos"
         }
       ]
     },
     {
       id: "equipos",
-      name: "Equipamiento",
-      description: "Contamos con equipos médicos de última generación para diagnósticos precisos",
+      name: "Equipos Médicos",
+      description: "Tecnología médica avanzada para diagnósticos precisos y tratamientos efectivos",
       images: [
         {
-          src: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?auto=format&fit=crop&q=80",
-          alt: "Equipamiento médico",
-          caption: "Contamos con equipos médicos de última generación"
-        },
-        {
-          src: "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&q=80",
-          alt: "Equipo de diagnóstico"
-        },
-        {
-          src: "https://images.unsplash.com/photo-1600443271879-6579d5e3f876?auto=format&fit=crop&q=80",
-          alt: "Consultorio equipado"
-        }
-      ]
-    },
-    {
-      id: "equipo",
-      name: "Nuestro Equipo",
-      description: "Personal médico altamente calificado a su servicio",
-      images: [
-        {
-          src: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80",
-          alt: "Personal médico",
-          caption: "Nuestro equipo de profesionales altamente calificados"
-        },
-        {
-          src: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80",
-          alt: "Médico especialista"
+          src: "https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bWVkaWNhbCUyMGVxdWlwbWVudHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+          alt: "Equipo de diagnóstico",
+          caption: "Equipos modernos para diagnósticos precisos"
         }
       ]
     }
@@ -156,22 +129,32 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
             
             <div className="gallery-grid">
               {category.images.map((image, imageIndex) => {
-                // Calculate the global index for this image
-                const globalIndex = categories.reduce((count, cat, catIndex) => {
-                  if (catIndex < categories.findIndex(c => c.id === category.id)) {
-                    return count + cat.images.length;
-                  }
-                  return count;
-                }, 0) + imageIndex;
+                // Group images by item (assuming images for the same item have consecutive indices)
+                // This logic can be adjusted based on your data structure
+                const hasMultipleImages = category.images.length > 1;
                 
                 return (
                   <div 
                     className="gallery-item" 
                     key={imageIndex} 
-                    onClick={() => onImageClick(globalIndex)}
+                    onClick={() => onImageClick(category.id, imageIndex)}
                   >
-                    <div className="gallery-image-container">
-                      <img src={image.src} alt={image.alt || 'Imagen de galería'} loading="lazy" />
+                    <div className={`gallery-image-container ${hasMultipleImages ? 'has-multiple' : ''}`}>
+                      <img 
+                        src={image.src} 
+                        alt={image.alt || 'Imagen de galería'} 
+                        loading="lazy"
+                        onError={(e) => {
+                          console.error('Image failed to load:', image.src);
+                          e.target.onerror = null; // Prevent infinite callback loop
+                          e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
+                        }}
+                      />
+                      {hasMultipleImages && (
+                        <div className="gallery-corner-indicator">
+                          <FaImages /> {category.images.length}
+                        </div>
+                      )}
                       <div className="gallery-overlay">
                         <FaImage />
                         <span>Ver imagen</span>
@@ -190,8 +173,16 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
 };
 
 // Gallery Modal component
-const GalleryModal = ({ isOpen, images, currentIndex, onClose, onNext, onPrev }) => {
-  if (!isOpen || !images || images.length === 0) return null;
+const GalleryModal = ({ isOpen, categories, currentCategory, currentIndex, onClose, onNext, onPrev }) => {
+  if (!isOpen || !categories || categories.length === 0) return null;
+  
+  // Find the current category by ID
+  const category = categories.find(cat => cat.id === currentCategory);
+  if (!category) return null;
+  
+  // Use only images from the selected category
+  const images = category.images;
+  if (!images || images.length === 0) return null;
   
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') onClose();
@@ -201,37 +192,58 @@ const GalleryModal = ({ isOpen, images, currentIndex, onClose, onNext, onPrev })
   
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Disable scrolling on body when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      // Re-enable scrolling when modal is closed
+      document.body.style.overflow = 'auto';
+    };
   }, []);
   
   const currentImage = images[currentIndex];
   
+  // Error handling for image load
+  const handleImageError = (e) => {
+    console.error('Modal image failed to load:', currentImage.src);
+    e.target.onerror = null; // Prevent infinite callback loop
+    e.target.src = 'https://via.placeholder.com/800x600?text=Imagen+No+Disponible';
+  };
+  
+  // Use createPortal to render the modal outside the normal DOM hierarchy
   return (
-    <div className="gallery-modal" onClick={onClose}>
-      <button className="gallery-close" onClick={onClose}>
-        <FaTimes />
-      </button>
-      <button className="gallery-nav gallery-prev" onClick={onPrev}>
-        <FaArrowLeft />
-      </button>
-      <div className="gallery-content" onClick={(e) => e.stopPropagation()}>
-        <img 
-          src={currentImage.src} 
-          alt={currentImage.alt || 'Imagen ampliada'} 
-          className="gallery-modal-image"
-        />
-        <div className="gallery-modal-caption">
-          {currentImage.category && (
-            <div className="gallery-image-category">{currentImage.category}</div>
-          )}
-          <h3>{currentImage.alt || 'Imagen'}</h3>
-          {currentImage.caption && <p>{currentImage.caption}</p>}
-          <div className="gallery-counter">
-            {currentIndex + 1} / {images.length}
-          </div>
+    <div className="gallery-modal">
+      <div className="gallery-modal-overlay" onClick={onClose}></div>
+      
+      <div className="gallery-modal-container">
+        <div className="gallery-category-top">{category.name.toUpperCase()}</div>
+        
+        <div className="gallery-image-area">
+          <img 
+            src={currentImage.src} 
+            alt={currentImage.alt || 'Imagen ampliada'} 
+            className="gallery-modal-image"
+            onError={handleImageError}
+          />
+        </div>
+        
+        <div className="gallery-info-area">
+          <h2 className="gallery-title">{currentImage.alt || 'Imagen'}</h2>
+          <p className="gallery-description">{currentImage.caption || ''}</p>
+          <div className="gallery-counter">{currentIndex + 1} / {images.length}</div>
         </div>
       </div>
-      <button className="gallery-nav gallery-next" onClick={onNext}>
+      
+      <button className="gallery-close-btn" onClick={onClose} aria-label="Cerrar">
+        <FaTimes />
+      </button>
+      
+      <button className="gallery-nav gallery-prev" onClick={(e) => { e.stopPropagation(); onPrev(e); }} aria-label="Anterior">
+        <FaArrowLeft />
+      </button>
+      
+      <button className="gallery-nav gallery-next" onClick={(e) => { e.stopPropagation(); onNext(e); }} aria-label="Siguiente">
         <FaArrowRight />
       </button>
     </div>
@@ -241,14 +253,34 @@ const GalleryModal = ({ isOpen, images, currentIndex, onClose, onNext, onPrev })
 const Contact = () => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const [currentCategory, setCurrentCategory] = useState(null);
   const [isIntersecting, setIsIntersecting] = useState({
     info: false,
     map: false,
     gallery: false
   });
+  const [galleryData, setGalleryData] = useState(fallbackGallery);
+  const [loading, setLoading] = useState(true);
 
-  // Get all images for the modal view
-  const allGalleryImages = hospitalGallery.getAllImages();
+  // Fetch gallery data
+  useEffect(() => {
+    const fetchGalleryData = async () => {
+      try {
+        setLoading(true);
+        const data = await galleryService.getGalleryDataForContact();
+        if (data && data.categories && data.categories.length > 0) {
+          setGalleryData(data);
+        }
+      } catch (error) {
+        console.error('Error loading gallery data:', error);
+        // Fallback to default data is handled by the service
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGalleryData();
+  }, []);
 
   useEffect(() => {
     const observerOptions = {
@@ -294,10 +326,11 @@ const Contact = () => {
       if (mapSection) observer.unobserve(mapSection);
       if (gallerySection) observer.unobserve(gallerySection);
     };
-  }, []);
+  }, [loading]);
 
-  const openGallery = (index) => {
-    setCurrentImage(index);
+  const openGallery = (categoryId, imageIndex) => {
+    setCurrentCategory(categoryId);
+    setCurrentImage(imageIndex);
     setGalleryOpen(true);
     document.body.style.overflow = 'hidden';
   };
@@ -309,12 +342,18 @@ const Contact = () => {
 
   const nextImage = (e) => {
     e.stopPropagation();
-    setCurrentImage((prev) => (prev === allGalleryImages.length - 1 ? 0 : prev + 1));
+    const category = galleryData.categories.find(cat => cat.id === currentCategory);
+    if (!category) return;
+    
+    setCurrentImage((prev) => (prev === category.images.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = (e) => {
     e.stopPropagation();
-    setCurrentImage((prev) => (prev === 0 ? allGalleryImages.length - 1 : prev - 1));
+    const category = galleryData.categories.find(cat => cat.id === currentCategory);
+    if (!category) return;
+    
+    setCurrentImage((prev) => (prev === 0 ? category.images.length - 1 : prev - 1));
   };
 
   return (
@@ -323,10 +362,13 @@ const Contact = () => {
         <div className="contact-hero-content">
           <h1>Contacto</h1>
           <p>Estamos aquí para atender sus consultas y brindarle la mejor atención</p>
+
+          {/* Scroll indicator 
           <div className="hero-scroll-indicator">
             <div className="scroll-arrow"></div>
             <span>Desplazar para más información</span>
           </div>
+          */}
         </div>
       </section>
 
@@ -394,25 +436,32 @@ const Contact = () => {
 
       {/* Using the Categorized Gallery component */}
       <div className={`${isIntersecting.gallery ? 'animate-in' : ''}`}>
-        <CategorizedGallery 
-          title={hospitalGallery.title}
-          subtitle={hospitalGallery.subtitle}
-          categories={hospitalGallery.categories}
-          onImageClick={openGallery}
-        />
+        {loading ? (
+          <div className="loading-gallery">
+            <p>Cargando galería...</p>
+          </div>
+        ) : (
+          <CategorizedGallery 
+            title={galleryData.title}
+            subtitle={galleryData.subtitle}
+            categories={galleryData.categories}
+            onImageClick={openGallery}
+          />
+        )}
       </div>
 
       {/* Gallery Modal */}
       <GalleryModal 
         isOpen={galleryOpen}
-        images={allGalleryImages}
+        categories={galleryData.categories}
+        currentCategory={currentCategory}
         currentIndex={currentImage}
         onClose={closeGallery}
         onNext={nextImage}
         onPrev={prevImage}
       />
 
-      {/* Map section moved to the end */}
+      {/* Map section */}
       <section className={`map-section ${isIntersecting.map ? 'animate-in' : ''}`}>
         <div className="container">
           <h2 className="section-title">Nuestra Ubicación</h2>
@@ -439,32 +488,13 @@ const Contact = () => {
                   <p>Lago Agrio, Ecuador</p>
                   <div className="map-actions">
                     <a 
-                      href="https://www.google.com/maps/place/Centro+de+Especialidades+M%C3%A9dicas+Dr.+Marco+Vinicio+Mullo/@0.0810827,-76.8971807,17z/data=!3m1!4b1!4m6!3m5!1s0x8e2823dd9358d955:0xdea910ce43daba02!8m2!3d0.0810827!4d-76.8971807!16s%2Fg%2F11h0crfskr?entry=ttu" 
-                      className="btn btn-outline"
-                      target="_blank"
+                      href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" 
+                      className="action-btn" 
+                      target="_blank" 
                       rel="noopener noreferrer"
                     >
                       <FaDirections /> Cómo llegar
                     </a>
-                    <a 
-                      href="https://www.google.com/maps/uv?pb=!1s0x8e2823dd9358d955%3A0xdea910ce43daba02!3m1!7e115!4s%2Fmaps%2Fplace%2Fclinica%2Bmullo%2F%400.0811518%2C-76.8970863%2C3a%2C75y%2C36.37h%2C90t%2Fdata%3D*213m4*211e1*213m2*211s4zWEjZt6y-pSDFnysuSVVQ*212e0*214m2*213m1*211s0x8e2823dd9358d955%3A0xdea910ce43daba02%3Fsa%3DX%26ved%3D2ahUKEwjk4fGiveSMAxXmSjABHeA3LqsQpx96BAgxEAA!5sclinica%20mullo%20-%20Google%20Search!15sCgIgAQ&imagekey=!1e2!2s4zWEjZt6y-pSDFnysuSVVQ&cr=le_a7&hl=en" 
-                      className="btn btn-outline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FaImage /> Ver fotos 360°
-                    </a>
-                  </div>
-                </div>
-                <div className="map-hours">
-                  <h4>Horario de Atención</h4>
-                  <div className="hours-grid">
-                    <div className="day">Lunes - Viernes:</div>
-                    <div className="time">8:00 AM - 7:00 PM</div>
-                    <div className="day">Sábados:</div>
-                    <div className="time">8:00 AM - 2:00 PM</div>
-                    <div className="day">Domingos:</div>
-                    <div className="time">Cerrado</div>
                   </div>
                 </div>
               </div>

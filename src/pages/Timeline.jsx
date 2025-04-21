@@ -3,7 +3,9 @@ import { toast } from 'react-toastify';
 import timelineService from '../services/timelineService';
 import './Timeline.css';
 
+// Get base URL without /api for image loading
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const BASE_URL = API_URL.replace(/\/api$/, '');
 
 const Timeline = () => {
   const [timelines, setTimelines] = useState([]);
@@ -50,6 +52,12 @@ const Timeline = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function for image URLs
+  const getImageUrl = (imageName) => {
+    if (!imageName) return null;
+    return `${BASE_URL}/uploads/${imageName}`;
   };
 
   if (loading) {
@@ -99,10 +107,12 @@ const Timeline = () => {
                 {event.image && (
                   <div className="timeline-media">
                     <img
-                      src={`${API_URL}/uploads/${event.image}`}
+                      src={getImageUrl(event.image)}
                       alt={event.title}
                       onError={(e) => {
-                        e.target.src = '/uploads/image-not-found.jpg';
+                        console.error('Timeline image load error:', e.target.src);
+                        e.target.onerror = null; // Prevent infinite loop
+                        e.target.src = '/placeholder-image.jpg';
                       }}
                       loading="lazy"
                     />

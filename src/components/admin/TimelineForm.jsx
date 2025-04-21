@@ -62,7 +62,10 @@ const TimelineForm = ({ timeline, onSubmit, onClose }) => {
       
       // Only append image if it exists
       if (formData.image) {
+        console.log('Appending image to form data:', formData.image.name, formData.image.type, formData.image.size);
         formDataToSend.append('image', formData.image);
+      } else {
+        console.log('No image to append to form data');
       }
 
       await onSubmit(formDataToSend);
@@ -76,9 +79,38 @@ const TimelineForm = ({ timeline, onSubmit, onClose }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      console.log('Image selected:', file.name, file.type, file.size);
+      
+      // Validate file type
+      const fileType = file.type;
+      if (!['image/jpeg', 'image/png'].includes(fileType)) {
+        console.error('Invalid file type:', fileType);
+        setErrors(prev => ({
+          ...prev,
+          image: 'Only JPG and PNG image formats are allowed'
+        }));
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        console.error('File too large:', file.size);
+        setErrors(prev => ({
+          ...prev,
+          image: 'Image size should not exceed 5MB'
+        }));
+        return;
+      }
+      
       setFormData(prev => ({
         ...prev,
         image: file
+      }));
+      
+      // Clear any previous errors
+      setErrors(prev => ({
+        ...prev,
+        image: null
       }));
     }
   };
@@ -136,9 +168,9 @@ const TimelineForm = ({ timeline, onSubmit, onClose }) => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="image">
-          {timeline ? "Imagen (opcional)" : "Imagen <span className='required'>*</span>"}
-        </label>
+        <label htmlFor="image" dangerouslySetInnerHTML={{ 
+          __html: timeline ? "Imagen (opcional)" : "Imagen <span class='required'>*</span>" 
+        }} />
         <input
           type="file"
           id="image"

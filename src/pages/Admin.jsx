@@ -5,6 +5,7 @@ import PromotionsManager from '../components/admin/PromotionsManager';
 import ServicesManager from '../components/admin/ServicesManager';
 import PasswordReset from '../components/admin/PasswordReset';
 import TimelineManager from '../components/admin/TimelineManager';
+import GalleryManager from '../components/admin/GalleryManager';
 import './Admin.css';
 
 const Admin = () => {
@@ -81,6 +82,9 @@ const Admin = () => {
               <Link to="/admin/timeline">Timeline</Link>
             </li>
             <li>
+              <Link to="/admin/gallery">Gallery</Link>
+            </li>
+            <li>
               <Link to="/admin/password">Reset Password</Link>
             </li>
             <li>
@@ -96,6 +100,7 @@ const Admin = () => {
           <Route path="/promotions" element={<PromotionsManager />} />
           <Route path="/services" element={<ServicesManager />} />
           <Route path="/timeline" element={<TimelineManager />} />
+          <Route path="/gallery" element={<GalleryManager />} />
           <Route path="/password" element={<PasswordReset />} />
           <Route path="/" element={<Navigate to="/admin/promotions" replace />} />
         </Routes>

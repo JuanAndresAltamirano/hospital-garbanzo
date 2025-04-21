@@ -21,7 +21,7 @@ import PromotionForm from './PromotionForm';
 import { promotionsService } from '../../services/promotionsService';
 import './PromotionsManager.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const SortableItem = ({ id, promotion, onEdit, onDelete }) => {
   const {
@@ -44,8 +44,11 @@ const SortableItem = ({ id, promotion, onEdit, onDelete }) => {
       </div>
       <div className="promotion-image">
         <img
-          src={`${API_URL}/uploads/${promotion.image.split('/').pop()}`}
+          src={promotion.image ? `${API_URL.replace('/api', '')}/uploads/${promotion.image}` : '/placeholder-image.jpg'}
           alt={promotion.title}
+          onError={(e) => {
+            e.target.src = '/placeholder-image.jpg';
+          }}
         />
       </div>
       <div className="promotion-info">

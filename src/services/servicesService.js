@@ -89,7 +89,7 @@ class ServicesService {
   }
 
   async updateOrder(orderData) {
-    const response = await apiService.post('/services/reorder', { orderedIds: orderData });
+    const response = await apiService.post('/services/reorder', { orderedIds: orderData.map(item => item.id) });
     return response.data;
   }
 }

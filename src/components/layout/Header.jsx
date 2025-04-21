@@ -13,9 +13,9 @@ const Header = () => {
         </Link>
         <nav className="nav-links">
           <Link to="/">Inicio</Link>
-          <Link to="/services">Servicios</Link>
-          <Link to="/history">Sobre Nosotros</Link>
-          <Link to="/contact">Contacto</Link>
+          <Link to="/servicios">Servicios</Link>
+          <Link to="/nosotros">Sobre Nosotros</Link>
+          <Link to="/contacto">Contacto</Link>
         </nav>
         {/*
         <div className="auth-buttons">

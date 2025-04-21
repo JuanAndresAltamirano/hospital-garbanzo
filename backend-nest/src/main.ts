@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { existsSync, mkdirSync } from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,9 +16,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Set global prefix for API routes
-  app.setGlobalPrefix('api');
-
   // Global pipes
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -25,10 +23,24 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
 
-  // Serve static files from the uploads directory
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  // Ensure uploads directory exists
+  const uploadsPath = join(process.cwd(), 'uploads');
+  console.log('Setting up static assets from:', uploadsPath);
+  
+  if (!existsSync(uploadsPath)) {
+    console.log('Creating uploads directory');
+    mkdirSync(uploadsPath, { recursive: true });
+  }
+  
+  // First, serve static files directly without the /api prefix
+  app.useStaticAssets(uploadsPath, {
     prefix: '/uploads',
   });
+  
+  console.log('Static assets served at: /uploads/*');
+  
+  // Set global prefix for API routes - MUST be after useStaticAssets to not affect static paths
+  app.setGlobalPrefix('api');
 
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') || 3001;

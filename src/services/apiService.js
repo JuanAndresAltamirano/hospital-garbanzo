@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Create axios instance with default config
 const apiService = axios.create({
@@ -31,7 +31,7 @@ apiService.interceptors.response.use(
     // Handle 401 Unauthorized errors (token expired or invalid)
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/admin/login';
+      window.location.href = '/admin';
     }
     return Promise.reject(error);
   }
@@ -56,6 +56,7 @@ const login = async (credentials) => {
     const token = response.data.token || response.data.access_token;
     if (token) {
       localStorage.setItem('token', token);
+      apiService.setAuthToken(token);
       return response.data;
     }
     throw new Error('No token received from server');
@@ -66,6 +67,7 @@ const login = async (credentials) => {
 
 const logout = () => {
   localStorage.removeItem('token');
+  apiService.removeAuthToken();
   window.location.href = '/admin';
 };
 

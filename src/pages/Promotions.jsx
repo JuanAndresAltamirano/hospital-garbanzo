@@ -265,11 +265,11 @@ const Promotions = () => {
               <div className="relative w-full h-48">
                 
                 {promotion.image ? (<img
-                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/uploads/${promotion.image.split('/').pop()}`}
+                  src={`${(import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '')}/uploads/${promotion.image}`}
                   alt={promotion.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.target.src = './public/uploads/image-not-found.jpg';
+                    e.target.src = '/placeholder-image.jpg';
                   }}
                 />) : (<div className="absolute inset-0 bg-gray-200 flex items-center justify-center hidden">
                   <span className="text-gray-500">Image not available</span>

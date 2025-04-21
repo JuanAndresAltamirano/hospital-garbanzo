@@ -25,15 +25,15 @@ function AppContent() {
       <main className={`main-content ${isAdminRoute ? 'admin-page' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/:id" element={<ServiceDetail />} />
-          <Route path="/specialists" element={<Specialists />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/promotions" element={<Promotions />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/servicios" element={<Services />} />
+          <Route path="/servicios/:id" element={<ServiceDetail />} />
+          <Route path="/especialistas" element={<Specialists />} />
+          <Route path="/nosotros" element={<History />} />
+          <Route path="/promociones" element={<Promotions />} />
+          <Route path="/contacto" element={<Contact />} />
           <Route path="/admin/*" element={<Admin />} />
-          <Route path="/forgot-password" element={<PasswordRecovery />} />
-          <Route path="/reset-password" element={<PasswordReset />} />
+          <Route path="/recuperar-contrasena" element={<PasswordRecovery />} />
+          <Route path="/restablecer-contrasena" element={<PasswordReset />} />
         </Routes>
       </main>
       <ToastContainer position="bottom-right" />

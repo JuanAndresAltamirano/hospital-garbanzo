@@ -25,31 +25,93 @@ export class HistoryService {
       
       const displayOrder = (maxOrderResult?.maxOrder || 0) + 1;
 
-      // Handle file upload if provided
-      let imagePath: string | undefined = undefined;
+      // Debug file information
+      console.log('File received in create method:', file ? 'yes' : 'no');
+      
+      // Handle file upload manually if needed
+      let image: string | undefined = undefined;
+      
       if (file) {
-        const uploadsDir = path.join(process.cwd(), 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log('File details:', {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          fieldname: file.fieldname,
+          filename: file.filename,
+          path: file.path
+        });
+        
+        try {
+          // Ensure uploads directory exists
+          const uploadsDir = path.join(process.cwd(), 'uploads');
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+            console.log('Created uploads directory:', uploadsDir);
+          }
+          
+          // If Multer already saved the file, use that filename
+          if (file.filename && file.path) {
+            // Check if file exists at the expected path
+            if (fs.existsSync(file.path)) {
+              console.log('File already saved by Multer at:', file.path);
+              image = file.filename;
+            } else {
+              console.warn('File not found at expected path:', file.path);
+              
+              // Generate a unique filename
+              const fileExt = path.extname(file.originalname) || '.jpg';
+              const filename = `${uuidv4()}${fileExt}`;
+              const filepath = path.join(uploadsDir, filename);
+              
+              // Save file from buffer
+              if (file.buffer) {
+                fs.writeFileSync(filepath, file.buffer);
+                console.log('Manually saved file from buffer to:', filepath);
+                image = filename;
+              } else {
+                console.error('No file buffer available to save');
+              }
+            }
+          } else {
+            console.log('File does not have filename or path');
+            
+            // Generate a unique filename
+            const fileExt = path.extname(file.originalname) || '.jpg';
+            const filename = `${uuidv4()}${fileExt}`;
+            const filepath = path.join(uploadsDir, filename);
+            
+            // Save file from buffer
+            if (file.buffer) {
+              fs.writeFileSync(filepath, file.buffer);
+              console.log('Manually saved file to:', filepath);
+              image = filename;
+            } else {
+              console.error('No file buffer available to save');
+            }
+          }
+          
+          console.log('Image filename set to:', image);
+        } catch (err) {
+          console.error('Error saving file:', err);
         }
-
-        const fileExtension = path.extname(file.originalname);
-        const fileName = `${uuidv4()}${fileExtension}`;
-        const filePath = path.join(uploadsDir, fileName);
-
-        fs.writeFileSync(filePath, file.buffer);
-        imagePath = `/uploads/${fileName}`;
       }
-
+      
       // Create the timeline item
       const timeline = this.timelineRepository.create({
         ...createTimelineDto,
         displayOrder,
-        image: imagePath,
+        image,
       });
-
-      return await this.timelineRepository.save(timeline);
+      
+      const savedTimeline = await this.timelineRepository.save(timeline);
+      console.log('Saved timeline:', {
+        id: savedTimeline.id,
+        title: savedTimeline.title,
+        image: savedTimeline.image
+      });
+      return savedTimeline;
     } catch (error) {
+      console.error('Error creating timeline item:', error);
       throw new BadRequestException('Error creating timeline item: ' + error.message);
     }
   }
@@ -90,31 +152,27 @@ export class HistoryService {
 
       // Handle file upload if provided
       if (file) {
-        const uploadsDir = path.join(process.cwd(), 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-
         // Delete old image if exists
         if (timeline.image) {
-          const oldImagePath = path.join(process.cwd(), timeline.image);
-          if (fs.existsSync(oldImagePath)) {
-            fs.unlinkSync(oldImagePath);
+          try {
+            const oldImagePath = path.join(process.cwd(), 'uploads', timeline.image);
+            if (fs.existsSync(oldImagePath)) {
+              fs.unlinkSync(oldImagePath);
+            }
+          } catch (error) {
+            console.warn('Error deleting old image:', error);
           }
         }
 
-        const fileExtension = path.extname(file.originalname);
-        const fileName = `${uuidv4()}${fileExtension}`;
-        const filePath = path.join(uploadsDir, fileName);
-
-        fs.writeFileSync(filePath, file.buffer);
-        timeline.image = `/uploads/${fileName}`;
+        // Use only filename property which is set by Multer
+        timeline.image = file.filename;
       }
 
       // Update other fields
       Object.assign(timeline, updateTimelineDto);
       return await this.timelineRepository.save(timeline);
     } catch (error) {
+      console.error('Error updating timeline item:', error);
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -131,9 +189,13 @@ export class HistoryService {
 
       // Delete image file if exists
       if (timeline.image) {
-        const imagePath = path.join(process.cwd(), timeline.image);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
+        try {
+          const imagePath = path.join(process.cwd(), 'uploads', timeline.image);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        } catch (error) {
+          console.warn('Error deleting image file:', error);
         }
       }
 

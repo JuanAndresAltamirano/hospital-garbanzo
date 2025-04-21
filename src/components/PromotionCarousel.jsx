@@ -94,6 +94,13 @@ const PromotionCarousel = ({ promotions }) => {
                         <h3>{promotion.title}</h3>
                       </div>
                       
+                      {promotion.discount && (
+                        <div className="discount-badge">
+                          <FaPercentage />
+                          <span>¡{Math.round(promotion.discount)}% de descuento!</span>
+                        </div>
+                      )}
+                      
                       <p className="promotion-description">{promotion.description}</p>
                       
                       {remainingDays !== null && remainingDays <= 7 && (
@@ -133,6 +140,12 @@ const PromotionCarousel = ({ promotions }) => {
                       {promotion.discount && (
                         <div className="corner-ribbon">
                           {Math.round(promotion.discount)}% OFF
+                        </div>
+                      )}
+                      {promotion.discount && (
+                        <div className="floating-discount-badge">
+                          <div className="discount-amount">{Math.round(promotion.discount)}%</div>
+                          <div className="discount-text">DESCUENTO</div>
                         </div>
                       )}
                     </div>

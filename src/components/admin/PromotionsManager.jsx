@@ -37,6 +37,42 @@ const SortableItem = ({ id, promotion, onEdit, onDelete }) => {
     transition,
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No definida';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch (error) {
+      return 'Fecha inválida';
+    }
+  };
+
+  const isDefaultDate = (dateString, promotion) => {
+    if (!dateString) return false;
+    
+    // Check if date is likely a default date (within a few seconds of creation)
+    try {
+      const date = new Date(dateString);
+      const createdAt = new Date(promotion.createdAt);
+      
+      // If it's the same day as creation or exactly one year later, it's likely default
+      if (date.toDateString() === createdAt.toDateString()) {
+        return true;
+      }
+      
+      const oneYearLater = new Date(createdAt);
+      oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+      
+      if (date.toDateString() === oneYearLater.toDateString()) {
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      return false;
+    }
+  };
+
   return (
     <div ref={setNodeRef} style={style} className="promotion-item">
       <div className="drag-handle" {...attributes} {...listeners}>
@@ -54,9 +90,26 @@ const SortableItem = ({ id, promotion, onEdit, onDelete }) => {
       <div className="promotion-info">
         <h3>{promotion.title}</h3>
         <p>{promotion.description}</p>
-        <p className="valid-until">
-          Válido hasta: {new Date(promotion.endDate).toLocaleDateString()}
-        </p>
+        
+        {/* Show discount or promotional price */}
+        {promotion.discount > 0 ? (
+          <p className="discount-info">Descuento: {promotion.discount}%</p>
+        ) : promotion.promotionalPrice > 0 ? (
+          <p className="price-info">Precio promocional: ${promotion.promotionalPrice}</p>
+        ) : null}
+        
+        {/* Show dates if available */}
+        {(promotion.startDate || promotion.endDate) && (
+          <p className="valid-until">
+            {promotion.startDate && (
+              <>Válido desde: {isDefaultDate(promotion.startDate, promotion) ? 'No definida' : formatDate(promotion.startDate)}</>
+            )}
+            {promotion.startDate && promotion.endDate && " - "}
+            {promotion.endDate && (
+              <>Válido hasta: {isDefaultDate(promotion.endDate, promotion) ? 'No definida' : formatDate(promotion.endDate)}</>
+            )}
+          </p>
+        )}
       </div>
       <div className="promotion-actions">
         <button

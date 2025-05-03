@@ -293,4 +293,28 @@
   .gallery-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.categories-note {
+  margin-bottom: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.no-images-message {
+  padding: 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  color: #666;
+  grid-column: 1 / -1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-images-message p {
+  margin: 0;
+  font-style: italic;
 } 

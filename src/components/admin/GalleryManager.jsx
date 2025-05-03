@@ -32,18 +32,65 @@ const GalleryManager = () => {
       const mainCats = data.filter(cat => cat.isMainCategory || (!cat.parentId && !cat.parent));
       setMainCategories(mainCats);
       
-      // Select the first main category by default
-      if (mainCats.length > 0 && !selectedMainCategory) {
-        setSelectedMainCategory(mainCats[0]);
-        
-        // Get subcategories for this main category
-        const subs = data.filter(cat => cat.parentId === mainCats[0].id);
-        setSubcategories(subs);
-        
-        // If subcategories exist, select the first one
-        if (subs.length > 0) {
-          setSelectedSubcategory(subs[0]);
+      // Remember currently selected categories
+      const currentMainCategoryId = selectedMainCategory?.id;
+      const currentSubcategoryId = selectedSubcategory?.id;
+      
+      // Select the first main category by default if none is selected
+      if (mainCats.length > 0) {
+        // If we already had a main category selected, find and select it again
+        if (currentMainCategoryId) {
+          const mainCategory = mainCats.find(cat => cat.id === currentMainCategoryId);
+          if (mainCategory) {
+            setSelectedMainCategory(mainCategory);
+            
+            // Get subcategories for this main category
+            if (mainCategory.subcategories && mainCategory.subcategories.length > 0) {
+              setSubcategories(mainCategory.subcategories);
+              
+              // If we had a subcategory selected, select it again
+              if (currentSubcategoryId) {
+                const subcategory = mainCategory.subcategories.find(sub => sub.id === currentSubcategoryId);
+                if (subcategory) {
+                  setSelectedSubcategory(subcategory);
+                } else if (mainCategory.subcategories.length > 0) {
+                  // If previous subcategory not found, select the first one
+                  setSelectedSubcategory(mainCategory.subcategories[0]);
+                }
+              } else if (mainCategory.subcategories.length > 0) {
+                // No subcategory was previously selected, select the first one
+                setSelectedSubcategory(mainCategory.subcategories[0]);
+              }
+            } else {
+              setSubcategories([]);
+              setSelectedSubcategory(null);
+            }
+          } else {
+            // Previously selected main category not found, select the first one
+            setSelectedMainCategory(mainCats[0]);
+            if (mainCats[0].subcategories && mainCats[0].subcategories.length > 0) {
+              setSubcategories(mainCats[0].subcategories);
+              setSelectedSubcategory(mainCats[0].subcategories[0]);
+            } else {
+              setSubcategories([]);
+              setSelectedSubcategory(null);
+            }
+          }
+        } else {
+          // No main category was previously selected
+          setSelectedMainCategory(mainCats[0]);
+          if (mainCats[0].subcategories && mainCats[0].subcategories.length > 0) {
+            setSubcategories(mainCats[0].subcategories);
+            setSelectedSubcategory(mainCats[0].subcategories[0]);
+          } else {
+            setSubcategories([]);
+            setSelectedSubcategory(null);
+          }
         }
+      } else {
+        setSelectedMainCategory(null);
+        setSubcategories([]);
+        setSelectedSubcategory(null);
       }
     } catch (error) {
       console.error('Error loading gallery categories:', error);
@@ -198,6 +245,12 @@ const GalleryManager = () => {
       return;
     }
     
+    // Check if trying to upload to a main category
+    if (!selectedSubcategory && selectedMainCategory?.isMainCategory) {
+      toast.error('Images can only be uploaded to subcategories. Please select a subcategory first.');
+      return;
+    }
+    
     if (!isEditing && !imageForm.image) {
       toast.error('Please select an image');
       return;
@@ -215,7 +268,8 @@ const GalleryManager = () => {
         await galleryService.updateImage(editingId, formData);
         toast.success('Image updated successfully');
       } else {
-        await galleryService.createImage(formData);
+        const response = await galleryService.createImage(formData);
+        console.log('Image creation response:', response);
         toast.success('Image uploaded successfully');
       }
       
@@ -225,7 +279,16 @@ const GalleryManager = () => {
       setIsEditing(false);
       setEditingId(null);
       setImagePreview(null);
+      
+      // Debug log before reloading categories
+      console.log('About to reload categories after image upload/edit');
       await loadCategories();
+      console.log('Categories reloaded. Current subcategory:', selectedSubcategory);
+      
+      // If there's a subcategory selected, verify its images
+      if (selectedSubcategory) {
+        console.log('Selected subcategory images:', selectedSubcategory.images);
+      }
     } catch (error) {
       console.error('Error saving image:', error);
       toast.error(error.response?.data?.message || 'Error saving image');
@@ -356,6 +419,10 @@ const GalleryManager = () => {
           </button>
         </div>
         
+        <div className="categories-note">
+          <small>Note: First select a main category, then a subcategory before uploading images.</small>
+        </div>
+        
         <div className="categories-list">
           {mainCategories.map(category => (
             <div 
@@ -410,6 +477,10 @@ const GalleryManager = () => {
           </button>
         </div>
         
+        <div className="categories-note">
+          <small>Select a subcategory below to upload images. Images can only be uploaded to subcategories.</small>
+        </div>
+        
         <div className="categories-list">
           {subcategories.map(subcategory => (
             <div 
@@ -449,7 +520,20 @@ const GalleryManager = () => {
     const currentCategory = selectedSubcategory || selectedMainCategory;
     if (!currentCategory) return null;
     
-    const images = currentCategory.images || [];
+    // Get up-to-date images array
+    let images = [];
+    
+    if (selectedSubcategory) {
+      // If a subcategory is selected, check for its images
+      console.log('Getting images for subcategory:', selectedSubcategory.id);
+      images = selectedSubcategory.images || [];
+      console.log('Found images count:', images.length);
+    } else if (selectedMainCategory) {
+      // If only a main category is selected, get its images
+      console.log('Getting images for main category:', selectedMainCategory.id);
+      images = selectedMainCategory.images || [];
+      console.log('Found images count:', images.length);
+    }
     
     return (
       <div className="images-section">
@@ -458,6 +542,11 @@ const GalleryManager = () => {
           <button 
             className="add-button"
             onClick={() => {
+              // Only allow uploads to subcategories
+              if (!selectedSubcategory && currentCategory.isMainCategory) {
+                toast.warning('Please select a subcategory first. Images can only be uploaded to subcategories.');
+                return;
+              }
               setImageForm({ alt: '', caption: '', image: null, categoryId: currentCategory.id });
               setIsEditing(false);
               setImagePreview(null);
@@ -469,26 +558,32 @@ const GalleryManager = () => {
         </div>
         
         <div className="images-grid">
-          {images.map(image => (
-            <div key={image.id} className="image-card">
-              <img src={image.src} alt={image.alt || 'Gallery image'} />
-              <div className="image-caption">{image.caption || image.alt || ''}</div>
-              <div className="image-actions">
-                <button 
-                  className="edit-button"
-                  onClick={() => editImage(image)}
-                >
-                  <FaEdit />
-                </button>
-                <button 
-                  className="delete-button"
-                  onClick={() => deleteImage(image.id)}
-                >
-                  <FaTrash />
-                </button>
-              </div>
+          {images.length === 0 ? (
+            <div className="no-images-message">
+              <p>No images found. {!selectedSubcategory ? 'Select a subcategory and upload images.' : 'Upload some images to get started.'}</p>
             </div>
-          ))}
+          ) : (
+            images.map((image, imageIndex) => (
+              <div key={image.id} className="image-card">
+                <img src={image.src} alt={image.alt || 'Gallery image'} />
+                <div className="image-caption">{image.caption || image.alt || ''}</div>
+                <div className="image-actions">
+                  <button 
+                    className="edit-button"
+                    onClick={() => editImage(image)}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button 
+                    className="delete-button"
+                    onClick={() => deleteImage(image.id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     );

@@ -4,7 +4,9 @@ import './PromotionForm.css';
 const PromotionForm = ({ promotion, onSubmit, onClose }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [discountType, setDiscountType] = useState('percentage'); // 'percentage' or 'price'
   const [discount, setDiscount] = useState('');
+  const [promotionalPrice, setPromotionalPrice] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isActive, setIsActive] = useState(true);
@@ -16,9 +18,18 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
     if (promotion) {
       setTitle(promotion.title);
       setDescription(promotion.description);
-      setDiscount(promotion.discount);
-      setStartDate(promotion.startDate.split('T')[0]);
-      setEndDate(promotion.endDate.split('T')[0]);
+      
+      // Determine if it's a percentage discount or promotional price
+      if (promotion.promotionalPrice) {
+        setDiscountType('price');
+        setPromotionalPrice(promotion.promotionalPrice);
+      } else {
+        setDiscountType('percentage');
+        setDiscount(promotion.discount || '');
+      }
+      
+      setStartDate(promotion.startDate ? promotion.startDate.split('T')[0] : '');
+      setEndDate(promotion.endDate ? promotion.endDate.split('T')[0] : '');
       setIsActive(promotion.isActive);
     }
   }, [promotion]);
@@ -33,11 +44,26 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
       const data = {
         title,
         description,
-        discount: parseInt(discount, 10),
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
         isActive: isActive === true || isActive === 'true'
       };
+      
+      // Add either discount or promotional price based on selected type
+      if (discountType === 'percentage') {
+        data.discount = parseInt(discount, 10) || 0;
+        data.promotionalPrice = 0;
+      } else {
+        data.promotionalPrice = parseFloat(promotionalPrice) || 0;
+        data.discount = 0;
+      }
+      
+      // Only set dates if they were actually entered
+      if (startDate) {
+        data.startDate = new Date(startDate).toISOString();
+      }
+      
+      if (endDate) {
+        data.endDate = new Date(endDate).toISOString();
+      }
 
       // Now create FormData
       const formData = new FormData();
@@ -46,12 +72,23 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
       formData.append('title', data.title);
       formData.append('description', data.description);
       
-      // Add number fields
-      formData.append('discount', data.discount.toString());
+      // Add either discount or promotional price
+      if (discountType === 'percentage') {
+        formData.append('discount', data.discount.toString());
+        formData.append('promotionalPrice', '0');
+      } else {
+        formData.append('promotionalPrice', data.promotionalPrice.toString());
+        formData.append('discount', '0');
+      }
       
-      // Add date fields - send as ISO string
-      formData.append('startDate', data.startDate);
-      formData.append('endDate', data.endDate);
+      // Add dates only if they exist
+      if (data.startDate) {
+        formData.append('startDate', data.startDate);
+      }
+      
+      if (data.endDate) {
+        formData.append('endDate', data.endDate);
+      }
       
       // Add boolean field
       formData.append('isActive', data.isActive.toString());
@@ -65,6 +102,7 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
         title: formData.get('title'),
         description: formData.get('description'),
         discount: formData.get('discount'),
+        promotionalPrice: formData.get('promotionalPrice'),
         startDate: formData.get('startDate'),
         endDate: formData.get('endDate'),
         isActive: formData.get('isActive'),
@@ -113,43 +151,89 @@ const PromotionForm = ({ promotion, onSubmit, onClose }) => {
           disabled={loading}
           required
         />
+        <div className="form-help-text">
+          Soporta formato Markdown. Puedes usar **negrita**, *cursiva*, ## títulos, 
+          listas con * o 1., [enlaces](https://ejemplo.com), y más.
+        </div>
       </div>
 
       <div className="form-group">
-        <label htmlFor="discount">Descuento (%)</label>
-        <input
-          type="number"
-          id="discount"
-          min="0"
-          max="100"
-          value={discount}
-          onChange={(e) => setDiscount(e.target.value)}
-          disabled={loading}
-          required
-        />
+        <label>Tipo de Promoción</label>
+        <div className="discount-type-selector">
+          <label className="radio-label">
+            <input
+              type="radio"
+              name="discountType"
+              value="percentage"
+              checked={discountType === 'percentage'}
+              onChange={() => setDiscountType('percentage')}
+              disabled={loading}
+            />
+            Descuento (%)
+          </label>
+          <label className="radio-label">
+            <input
+              type="radio"
+              name="discountType"
+              value="price"
+              checked={discountType === 'price'}
+              onChange={() => setDiscountType('price')}
+              disabled={loading}
+            />
+            Precio Promocional ($)
+          </label>
+        </div>
       </div>
 
+      {discountType === 'percentage' ? (
+        <div className="form-group">
+          <label htmlFor="discount">Descuento (%)</label>
+          <input
+            type="number"
+            id="discount"
+            min="0"
+            max="100"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+      ) : (
+        <div className="form-group">
+          <label htmlFor="promotionalPrice">Precio Promocional ($)</label>
+          <input
+            type="number"
+            id="promotionalPrice"
+            min="0"
+            step="0.01"
+            value={promotionalPrice}
+            onChange={(e) => setPromotionalPrice(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+      )}
+
       <div className="form-group">
-        <label htmlFor="startDate">Fecha de Inicio</label>
+        <label htmlFor="startDate">Fecha de Inicio (usa hoy si está vacío)</label>
         <input
           type="date"
           id="startDate"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
           disabled={loading}
-          required
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="endDate">Fecha de Fin</label>
+        <label htmlFor="endDate">Fecha de Fin (usa un año desde hoy si está vacío)</label>
         <input
           type="date"
           id="endDate"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           disabled={loading}
-          required
         />
       </div>
 

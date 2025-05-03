@@ -21,10 +21,12 @@ const Promotions = () => {
     startDate: '',
     endDate: '',
     discount: '',
+    promotionalPrice: '',
     image: null
   });
   const [errors, setErrors] = useState({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [priceType, setPriceType] = useState('discount'); // 'discount' or 'promotionalPrice'
 
   useEffect(() => {
     fetchPromotions();
@@ -78,9 +80,13 @@ const Promotions = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'El título es requerido';
     if (!formData.description.trim()) newErrors.description = 'La descripción es requerida';
-    if (!formData.startDate) newErrors.startDate = 'La fecha de inicio es requerida';
-    if (!formData.endDate) newErrors.endDate = 'La fecha de fin es requerida';
-    if (!formData.discount) newErrors.discount = 'El descuento es requerido';
+    
+    // Either discount or promotionalPrice should be filled, but not both
+    if (!formData.discount && !formData.promotionalPrice) {
+      newErrors.discount = 'Debe ingresar un descuento o un precio promocional';
+      newErrors.promotionalPrice = 'Debe ingresar un descuento o un precio promocional';
+    }
+    
     if (!formData.image) newErrors.image = 'La imagen es requerida';
 
     setErrors(newErrors);
@@ -94,9 +100,24 @@ const Promotions = () => {
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('description', formData.description);
-    formDataToSend.append('startDate', formData.startDate);
-    formDataToSend.append('endDate', formData.endDate);
-    formDataToSend.append('discount', formData.discount);
+    
+    if (formData.startDate) {
+      formDataToSend.append('startDate', formData.startDate);
+    }
+    
+    if (formData.endDate) {
+      formDataToSend.append('endDate', formData.endDate);
+    }
+    
+    // Send discount or promotional price based on what was entered
+    if (formData.discount) {
+      formDataToSend.append('discount', formData.discount);
+      formDataToSend.append('promotionalPrice', '0');
+    } else if (formData.promotionalPrice) {
+      formDataToSend.append('promotionalPrice', formData.promotionalPrice);
+      formDataToSend.append('discount', '0');
+    }
+    
     formDataToSend.append('image', formData.image);
 
     try {
@@ -114,6 +135,7 @@ const Promotions = () => {
         startDate: '',
         endDate: '',
         discount: '',
+        promotionalPrice: '',
         image: null
       });
     } catch (error) {
@@ -148,7 +170,7 @@ const Promotions = () => {
         <button
           data-testid="create-promotion-button"
           onClick={() => setShowForm(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-[cadetblue] text-white px-4 py-2 rounded hover:bg-[#436e70]"
         >
           Nueva Promoción
         </button>
@@ -224,6 +246,19 @@ const Promotions = () => {
               </div>
 
               <div className="mb-4">
+                <label className="block mb-1">Precio promocional</label>
+                <input
+                  type="text"
+                  name="promotionalPrice"
+                  data-testid="promotion-promotional-price"
+                  value={formData.promotionalPrice}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.promotionalPrice && <p className="text-red-500 text-sm mt-1">{errors.promotionalPrice}</p>}
+              </div>
+
+              <div className="mb-4">
                 <label className="block mb-1">Imagen</label>
                 <input
                   type="file"
@@ -246,7 +281,7 @@ const Promotions = () => {
                 <button
                   type="submit"
                   data-testid="submit-promotion"
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-[cadetblue] text-white px-4 py-2 rounded hover:bg-[#436e70]"
                 >
                   Crear
                 </button>
@@ -280,6 +315,19 @@ const Promotions = () => {
               <div className="p-4 space-y-2">
                 <h3 className="font-bold text-lg text-gray-800">{promotion.title}</h3>
                 <p className="text-gray-600 line-clamp-2">{promotion.description}</p>
+                
+                {promotion.discount > 0 && (
+                  <p className="text-sm text-red-600 font-medium">
+                    Descuento: {promotion.discount}%
+                  </p>
+                )}
+                
+                {promotion.promotionalPrice > 0 && (
+                  <p className="text-sm text-blue-600 font-medium">
+                    Precio promocional: ${parseFloat(promotion.promotionalPrice).toFixed(2)}
+                  </p>
+                )}
+                
                 <div className="space-y-1">
                   {promotion.startDate && (<p className="text-sm text-gray-500 flex items-center">
                     <span className="font-medium">Válido desde:</span>

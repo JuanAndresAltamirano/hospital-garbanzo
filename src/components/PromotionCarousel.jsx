@@ -4,24 +4,75 @@ import { FaChevronLeft, FaChevronRight, FaCalendarAlt, FaPercentage, FaArrowRigh
          FaClock, FaTag, FaHospital } from 'react-icons/fa';
 import { format, isValid, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import './PromotionCarousel.css';
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Fecha no disponible';
-  const date = parseISO(dateString);
-  return isValid(date) ? format(date, 'dd MMMM yyyy', { locale: es }) : 'Fecha inválida';
+  try {
+    const date = parseISO(dateString);
+    return isValid(date) ? format(date, 'dd MMMM yyyy', { locale: es }) : 'Fecha inválida';
+  } catch (error) {
+    return 'Fecha inválida';
+  }
 };
 
 const getRemainingDays = (endDateString) => {
   if (!endDateString) return null;
   
-  const endDate = parseISO(endDateString);
-  if (!isValid(endDate)) return null;
+  try {
+    const endDate = parseISO(endDateString);
+    if (!isValid(endDate)) return null;
 
-  const today = new Date();
-  const remainingDays = differenceInDays(endDate, today);
+    const today = new Date();
+    const remainingDays = differenceInDays(endDate, today);
+    
+    return remainingDays >= 0 ? remainingDays : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const formatDescription = (description) => {
+  if (!description) return null;
   
-  return remainingDays >= 0 ? remainingDays : null;
+  return (
+    <div className="markdown-content">
+      <ReactMarkdown 
+        remarkPlugins={[remarkGfm]} 
+        rehypePlugins={[rehypeRaw]}
+      >
+        {description}
+      </ReactMarkdown>
+    </div>
+  );
+};
+
+const isDefaultDate = (dateString, promotion) => {
+  if (!dateString) return true;
+  
+  try {
+    const date = new Date(dateString);
+    const createdAt = new Date(promotion.createdAt);
+    
+    // If it's the same day as creation or exactly one year later, it's likely default
+    if (date.toDateString() === createdAt.toDateString()) {
+      return true;
+    }
+    
+    const oneYearLater = new Date(createdAt);
+    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+    
+    if (date.toDateString() === oneYearLater.toDateString()) {
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    return true;
+  }
 };
 
 const PromotionCarousel = ({ promotions }) => {
@@ -71,7 +122,6 @@ const PromotionCarousel = ({ promotions }) => {
     <section className="health-promotions-section">
       <div className="decoration-left"></div>
       <div className="decoration-right"></div>
-      <h2 className="section-title">Promociones de Salud</h2>
       <div className="promotion-carousel">
         <div className="carousel-container">
           <div 
@@ -94,14 +144,25 @@ const PromotionCarousel = ({ promotions }) => {
                         <h3>{promotion.title}</h3>
                       </div>
                       
-                      {promotion.discount && (
-                        <div className="discount-badge">
-                          <FaPercentage />
-                          <span>¡{Math.round(promotion.discount)}% de descuento!</span>
+                      {(promotion.discount > 0 || promotion.promotionalPrice > 0) && (
+                        <div className={`discount-badge ${promotion.promotionalPrice > 0 ? 'price-badge' : ''}`}>
+                          {promotion.discount > 0 ? (
+                            <>
+                              <FaPercentage />
+                              <span>¡{Math.round(promotion.discount)}% de descuento!</span>
+                            </>
+                          ) : promotion.promotionalPrice > 0 ? (
+                            <>
+                              <span className="price-icon">$</span>
+                              <span>¡Precio promocional: ${parseFloat(promotion.promotionalPrice).toFixed(2)}!</span>
+                            </>
+                          ) : null}
                         </div>
                       )}
                       
-                      <p className="promotion-description">{promotion.description}</p>
+                      <div className="promotion-description">
+                        {formatDescription(promotion.description)}
+                      </div>
                       
                       {remainingDays !== null && remainingDays <= 7 && (
                         <div className="expiring-soon">
@@ -110,20 +171,28 @@ const PromotionCarousel = ({ promotions }) => {
                         </div>
                       )}
                       
-                      <div className="promotion-dates">
-                        <div className="date-item">
-                          <FaCalendarAlt />
-                          <span>Desde: {formatDate(promotion.startDate)}</span>
+                      {(promotion.startDate || promotion.endDate || promotion.service) && (
+                        <div className="promotion-dates">
+                          {promotion.startDate && (
+                            <div className="date-item">
+                              <FaCalendarAlt />
+                              <span>Desde: {formatDate(promotion.startDate)}</span>
+                            </div>
+                          )}
+                          {promotion.endDate && (
+                            <div className="date-item">
+                              <FaCalendarAlt />
+                              <span>Hasta: {formatDate(promotion.endDate)}</span>
+                            </div>
+                          )}
+                          {promotion.service && (
+                            <div className="date-item service-item">
+                              <FaHospital />
+                              <span>Servicio: {promotion.service}</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="date-item">
-                          <FaCalendarAlt />
-                          <span>Hasta: {formatDate(promotion.endDate)}</span>
-                        </div>
-                        <div className="date-item service-item">
-                          <FaHospital />
-                          <span>Servicio: {promotion.service || 'Consulta general'}</span>
-                        </div>
-                      </div>
+                      )}
                       
                       <button className="learn-more-btn">
                         Más Información <FaArrowRight />
@@ -137,17 +206,7 @@ const PromotionCarousel = ({ promotions }) => {
                           e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
                         }}
                       />
-                      {promotion.discount && (
-                        <div className="corner-ribbon">
-                          {Math.round(promotion.discount)}% OFF
-                        </div>
-                      )}
-                      {promotion.discount && (
-                        <div className="floating-discount-badge">
-                          <div className="discount-amount">{Math.round(promotion.discount)}%</div>
-                          <div className="discount-text">DESCUENTO</div>
-                        </div>
-                      )}
+              
                     </div>
                   </div>
                 </div>
@@ -188,7 +247,11 @@ PromotionCarousel.propTypes = {
       image: PropTypes.string.isRequired,
       startDate: PropTypes.string.isRequired,
       endDate: PropTypes.string.isRequired,
+      hasDefaultDates: PropTypes.bool,
+      isStartDateDefault: PropTypes.bool,
+      isEndDateDefault: PropTypes.bool,
       discount: PropTypes.number,
+      promotionalPrice: PropTypes.number,
       service: PropTypes.string
     })
   ).isRequired

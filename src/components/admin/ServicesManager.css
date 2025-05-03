@@ -48,8 +48,7 @@
 }
 
 .service-image {
-  width: 120px;
-  height: 80px;
+  
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;

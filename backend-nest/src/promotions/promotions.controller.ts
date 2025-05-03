@@ -33,9 +33,10 @@ export class PromotionsController {
     const transformedDto: CreatePromotionDto = {
       title: createPromotionDto.title,
       description: createPromotionDto.description,
-      discount: parseInt(createPromotionDto.discount, 10),
-      startDate: new Date(createPromotionDto.startDate),
-      endDate: new Date(createPromotionDto.endDate),
+      discount: parseInt(createPromotionDto.discount, 10) || 0,
+      promotionalPrice: parseFloat(createPromotionDto.promotionalPrice) || 0,
+      startDate: createPromotionDto.startDate ? new Date(createPromotionDto.startDate) : undefined,
+      endDate: createPromotionDto.endDate ? new Date(createPromotionDto.endDate) : undefined,
       isActive: createPromotionDto.isActive === 'true',
       image: ''
     };
@@ -83,9 +84,10 @@ export class PromotionsController {
     const transformedDto: UpdatePromotionDto = {
       title: updatePromotionDto.title,
       description: updatePromotionDto.description,
-      discount: parseInt(updatePromotionDto.discount, 10),
-      startDate: new Date(updatePromotionDto.startDate),
-      endDate: new Date(updatePromotionDto.endDate),
+      discount: parseInt(updatePromotionDto.discount, 10) || 0,
+      promotionalPrice: parseFloat(updatePromotionDto.promotionalPrice) || 0,
+      startDate: updatePromotionDto.startDate ? new Date(updatePromotionDto.startDate) : undefined,
+      endDate: updatePromotionDto.endDate ? new Date(updatePromotionDto.endDate) : undefined,
       isActive: updatePromotionDto.isActive === 'true',
     };
     

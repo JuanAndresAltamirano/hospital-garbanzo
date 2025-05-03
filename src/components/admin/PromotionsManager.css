@@ -84,6 +84,30 @@
   margin-top: 0.5rem;
 }
 
+.promotion-info .discount-info {
+  display: inline-block;
+  background-color: #fee2e2;
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.promotion-info .price-info {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+}
+
 .promotion-actions {
   display: flex;
   gap: 0.5rem;

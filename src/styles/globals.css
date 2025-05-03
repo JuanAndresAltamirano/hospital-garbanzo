@@ -1,20 +1,48 @@
 :root {
-  --primary-color: #E31837;  /* A more professional red */
-  --primary-light: #ff4d6a;
-  --primary-blue: #2c5282; /* Primary blue from home page */
-  --primary-red: #e53e3e; /* Primary red from home page */
-  --secondary-color: #FFFFFF;
-  --text-color: #2C3E50;
-  --background-light: #F8F9FA;
+  /* Primary Colors */
+  --primary-blue: #2c5282;
+  --primary-blue-light: #4299e1;
+  --primary-blue-dark: #2a4365;
+  --primary-red: #E31837; /* Main brand red */
+  --primary-red-light: #ff4d6a;
+  --primary-red-dark: #c53030;
+  
+  /* Text Colors */
+  --text-dark: #2d3748;
+  --text-medium: #4a5568;
+  --text-light: #718096;
+  
+  /* Background Colors */
   --background-white: #FFFFFF;
-  --gray-light: #E9ECEF;
-  --gray-medium: #6C757D;
-  --shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-large: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --background-light: #F8F9FA;
+  --background-card: #f7fafc;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  
+  /* Spacing & Layout */
   --border-radius: 8px;
+  --border-radius-lg: 12px;
   --spacing-unit: 1rem;
   --container-width: 1200px;
   --container-padding: 1rem;
+  
+  /* State Colors */
+  --error-color: #e53e3e;
+  --success-color: #38a169;
+  
+  /* Gradients */
+  --gradient-blue: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+  --gradient-blue-light: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
+  --gradient-red: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease-out;
 }
 
 * {
@@ -26,7 +54,7 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
-  color: var(--text-color);
+  color: var(--text-dark);
   background-color: var(--background-light);
   min-height: 100vh;
 }
@@ -60,6 +88,7 @@ body {
   padding: calc(var(--spacing-unit) * 4) 0;
 }
 
+/* Standardized Button Styles */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -68,37 +97,313 @@ body {
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-decoration: none;
   font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
+  background: linear-gradient(135deg, #ff4d6a, #e31837) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  padding: 1rem 2rem !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px !important;
+  box-shadow: 0 10px 25px rgba(227, 24, 55, 0.35) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  transform: translateZ(0);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-light);
-  transform: translateY(-1px);
+  transform: translateY(-5px) scale(1.03) !important;
+  box-shadow: 0 15px 30px rgba(227, 24, 55, 0.45) !important;
 }
 
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary svg, 
+.btn-primary i {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  animation: pulse-icon 1.5s infinite;
+}
+
+@keyframes pulse-icon {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+  color: var(--background-white);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, var(--primary-red-dark), var(--primary-red));
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-blue);
+  color: var(--background-white);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Add shine effect to all buttons */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+/* Standardized Card Styles */
 .card {
   background: var(--background-white);
   border-radius: var(--border-radius);
   padding: calc(var(--spacing-unit) * 1.5);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-large);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Standardized Section Titles */
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: cadetblue;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  position: relative;
+}
+
+.section-title:after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 5px;
+  background: linear-gradient(to right, cadetblue, var(--primary-red));
+  margin: 20px auto 0;
+  border-radius: 3px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-medium);
+  margin-bottom: 2rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* Standardized Hero Section */
+.hero-section {
+  background: var(--gradient-blue);
+  color: var(--background-white);
+  padding: 5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section h1 {
+  color: var(--background-white);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.hero-section h1:after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background: var(--primary-red);
+  margin: 20px auto 0;
+  border-radius: 2px;
+}
+
+.hero-section p {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+/* Standardized Promotion Card */
+.promo-card {
+  background-color: var(--background-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.promo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.promo-label {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: var(--primary-red);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 2;
+}
+
+.promo-discount {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--primary-red);
+  color: white;
+  padding: 1.5rem;
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  font-weight: 700;
+  font-size: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.promo-discount span {
+  transform: rotate(45deg) translate(5px, -15px);
+  display: block;
+}
+
+.promo-image {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  position: relative;
+}
+
+.promo-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.promo-card:hover .promo-image img {
+  transform: scale(1.05);
+}
+
+.promo-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-title {
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.promo-description {
+  color: var(--text-medium);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.promo-meta {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.promo-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-medium);
+  font-size: 0.95rem;
+}
+
+.promo-meta-item svg {
+  color: var(--primary-blue);
+  flex-shrink: 0;
+}
+
+.promo-actions {
+  margin-top: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--text-color);
+  color: var(--text-dark);
   line-height: 1.2;
   margin-bottom: 1rem;
 }
@@ -142,5 +447,9 @@ img {
 
   .section {
     padding: calc(var(--spacing-unit) * 2) 0;
+  }
+  
+  .hero-section {
+    padding: 4rem 1.5rem;
   }
 } 

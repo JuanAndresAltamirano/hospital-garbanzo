@@ -20,9 +20,9 @@
   bottom: 0;
   width: 2px;
   background: linear-gradient(180deg, 
-    rgba(44, 82, 130, 0.2) 0%,
-    rgba(44, 82, 130, 0.6) 50%,
-    rgba(44, 82, 130, 0.2) 100%
+    rgba(95, 158, 160, 0.2) 0%,
+    rgba(95, 158, 160, 0.6) 50%,
+    rgba(95, 158, 160, 0.2) 100%
   );
   transform: translateX(-50%);
   pointer-events: none;
@@ -60,12 +60,12 @@
 
 .timeline-date {
   padding: 0.4rem 1rem;
-  background-color: var(--primary-blue);
+  background-color: cadetblue;
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(44, 82, 130, 0.3);
+  box-shadow: 0 4px 10px rgba(95, 158, 160, 0.3);
   margin-bottom: 0.85rem;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -75,7 +75,7 @@
   height: 16px;
   border-radius: 50%;
   background: white;
-  border: 2px solid var(--primary-blue);
+  border: 2px solid cadetblue;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.6);
   transition: all 0.3s ease;
 }
@@ -98,14 +98,14 @@
 }
 
 .timeline-card:hover .timeline-dot {
-  background: var(--primary-blue);
+  background: cadetblue;
   transform: scale(1.2);
 }
 
 .timeline-card:hover .timeline-date {
   transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 8px 20px rgba(44, 82, 130, 0.4);
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+  box-shadow: 0 8px 20px rgba(95, 158, 160, 0.4);
+  background: linear-gradient(135deg, cadetblue, var(--primary-red));
   padding: 0.45rem 1.1rem;
   letter-spacing: 0.5px;
   font-weight: 700;
@@ -118,7 +118,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(to right, var(--primary-blue), var(--primary-red));
+  background: linear-gradient(to right, cadetblue, var(--primary-red));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -136,7 +136,7 @@
 .timeline-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--primary-blue);
+  color: cadetblue;
   margin: 0;
   padding: 1.2rem 1.5rem 0.8rem;
   line-height: 1.4;
@@ -186,9 +186,10 @@
 
 .timeline-content p {
   margin: 0;
-  color: var(--text-color);
+  color: #2a3a4a;
   font-size: 0.95rem;
   line-height: 1.6;
+  font-weight: 500;
 }
 
 /* Empty State */
@@ -213,7 +214,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(to right, var(--primary-blue), var(--primary-red));
+  background: linear-gradient(to right, cadetblue, var(--primary-red));
 }
 
 .timeline-empty-icon {
@@ -223,18 +224,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(44, 82, 130, 0.06);
+  background: rgba(95, 158, 160, 0.06);
   border-radius: 50%;
 }
 
 .timeline-empty-icon svg {
   width: 35px;
   height: 35px;
-  color: var(--primary-blue);
+  color: cadetblue;
 }
 
 .timeline-empty h3 {
-  color: var(--primary-blue);
+  color: cadetblue;
   font-size: 1.4rem;
   margin: 0 0 0.8rem;
   font-weight: 600;

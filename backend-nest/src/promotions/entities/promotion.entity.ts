@@ -17,11 +17,14 @@ export class Promotion {
   @Column('decimal', { precision: 5, scale: 2 })
   discount: number;
 
-  @Column({ type: 'timestamp' })
-  startDate: Date;
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  promotionalPrice: number;
 
-  @Column({ type: 'timestamp' })
-  endDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  startDate: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  endDate: Date | null;
 
   @Column({ default: true })
   isActive: boolean;

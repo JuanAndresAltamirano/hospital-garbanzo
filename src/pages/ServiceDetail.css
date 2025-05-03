@@ -1,15 +1,22 @@
 :root {
-  --primary-blue: #2c5282;
+  --primary-blue: cadetblue;
+  --primary-blue-light: #5f9ea0;
+  --primary-blue-dark: #436e70;
   --primary-red: #e53e3e;
   --text-dark: #2d3748;
   --text-medium: #4a5568;
   --text-light: #718096;
-  --background-white: #ffffff;
-  --background-light: #f8f9fa;
+  --background-white: #FFFFFF;
+  --background-light: #F8F9FA;
+  --background-card: #f7fafc;
+  --accent-color: #e53e3e;
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --border-radius: 8px;
+  --gradient-blue: linear-gradient(to right, cadetblue, #4a5568);
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
 }
 
 /* Service Detail Container */
@@ -19,7 +26,7 @@
 
 /* Service Detail Header */
 .service-detail-header {
-  background: linear-gradient(rgba(44, 82, 130, 0.95), rgba(44, 82, 130, 0.95)),
+  background: linear-gradient(rgba(95, 158, 160, 0.95), rgba(67, 110, 112, 0.95)),
               url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80');
   background-size: cover;
   background-position: center;
@@ -83,7 +90,7 @@
 
 .service-detail-spinner circle {
   fill: none;
-  stroke: var(--primary-blue);
+  stroke: cadetblue;
   stroke-width: 8;
   stroke-linecap: round;
   stroke-dasharray: 150, 200;
@@ -169,7 +176,7 @@
 }
 
 .service-detail-info h2 {
-  color: var(--primary-blue);
+  color: cadetblue;
   font-size: 1.8rem;
   margin-bottom: 1rem;
   position: relative;
@@ -188,6 +195,7 @@
   color: var(--text-medium);
   line-height: 1.7;
   margin-bottom: 2rem;
+  text-align: justify;
 }
 
 .service-meta {
@@ -210,7 +218,7 @@
 }
 
 .service-meta-item svg {
-  color: var(--primary-blue);
+  color: cadetblue;
   margin-right: 0.5rem;
   font-size: 1.2rem;
 }
@@ -245,7 +253,7 @@
 }
 
 .appointment-button:hover {
-  background-color: #1a365d;
+  background-color: rgba(95, 158, 160, 0.8);
 }
 
 /* Additional Content */
@@ -264,7 +272,7 @@
 }
 
 .service-benefits h3, .service-faq h3 {
-  color: var(--primary-blue);
+  color: cadetblue;
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
   position: relative;
@@ -298,7 +306,7 @@
 
 .service-benefits li:before {
   content: '✓';
-  color: var(--primary-blue);
+  color: cadetblue;
   position: absolute;
   left: 0;
   font-weight: bold;
@@ -325,47 +333,101 @@
 
 /* Call to Action */
 .service-cta {
-  background: linear-gradient(135deg, var(--primary-blue), #1a365d);
+  background: linear-gradient(rgba(95, 158, 160, 0.95), rgba(67, 110, 112, 0.95)),
+              url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
   color: white;
-  border-radius: var(--border-radius);
-  padding: 3rem 2rem;
+  padding: 3.5rem 0;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 0;
+  box-shadow: 0 15px 30px rgba(95, 158, 160, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add decorative elements */
+.service-cta::before {
+  display: none; /* Hide the pattern overlay */
+}
+
+.service-cta::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  transform: rotate(30deg);
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 .service-cta h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  display: inline-block;
+}
+
+.service-cta h3::after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-red), rgba(229, 62, 62, 0.5));
+  margin: 15px auto 0;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .service-cta p {
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto 2rem;
+  opacity: 0.95;
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
 }
 
 .cta-buttons {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .contact-button, .phone-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius);
+  padding: 1rem 2rem;
+  border-radius: 30px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  min-width: 180px;
 }
 
 .contact-button {
   background-color: white;
-  color: var(--primary-blue);
+  color: cadetblue;
 }
 
 .contact-button:hover {
   background-color: #f8f9fa;
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .phone-button {
@@ -376,7 +438,31 @@
 
 .phone-button:hover {
   background-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Button shine effects */
+.contact-button::before, .phone-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: all 0.75s ease;
+}
+
+.contact-button:hover::before, .phone-button:hover::before {
+  left: 125%;
+  transition: all 0.75s ease;
 }
 
 /* Responsive Design */
@@ -418,4 +504,12 @@
   .service-faq {
     padding: 1.5rem;
   }
+}
+
+.service-cta .container {
+  padding: 0 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
 } 

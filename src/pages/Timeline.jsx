@@ -7,9 +7,26 @@ import './Timeline.css';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const BASE_URL = API_URL.replace(/\/api$/, '');
 
+// Default timeline entries to use as fallback
+const defaultTimelineEntries = [
+  {
+    id: 'default-1',
+    year: '2011',
+    title: 'Fundación',
+    description: 'El Dr. Marco Vinicio Mullo, con una visión clara y ambiciosa, fundó nuestro centro médico con el objetivo de ofrecer atención de calidad a toda la población. Su sueño era crear un espacio amplio que combinara diversos servicios especializados, accesibles a precios razonables sin comprometer la excelencia.'
+  },
+  {
+    id: 'default-2',
+    year: '2011-Presente',
+    title: 'Crecimiento y Desarrollo',
+    description: 'El Dr. Mullo se comprometió a equipar el centro con tecnología de vanguardia y a diseñar un ambiente cómodo y acogedor para los pacientes. Gracias a su liderazgo y dedicación, el centro médico ha crecido hasta convertirse en un referente en la región, reconocido por su equipo profesional y su enfoque integral en la atención médica. Hoy, seguimos fieles a la visión del Dr. Mullo, proporcionando cuidados excepcionales con un equipo de especialistas altamente capacitados y la mejor tecnología disponible, siempre con el objetivo de servir a nuestra comunidad de manera integral y accesible.'
+  }
+];
+
 const Timeline = () => {
   const [timelines, setTimelines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const timelineRef = useRef(null);
 
   useEffect(() => {
@@ -45,10 +62,13 @@ const Timeline = () => {
       const data = await timelineService.getAll();
       // Sort by year
       const sortedData = [...data].sort((a, b) => a.year - b.year);
-      setTimelines(sortedData);
+      setTimelines(sortedData.length > 0 ? sortedData : defaultTimelineEntries);
     } catch (error) {
       console.error('Error fetching timelines:', error);
-      toast.error('Error al cargar la línea de tiempo');
+      setError(true);
+      // Use default timeline entries as fallback
+      setTimelines(defaultTimelineEntries);
+      toast.error('Error al cargar la línea de tiempo, mostrando información básica');
     } finally {
       setLoading(false);
     }

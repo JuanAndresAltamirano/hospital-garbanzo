@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsDateString, IsBoolean, Min, Max } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsDateString, IsBoolean, Min, Max, IsOptional } from 'class-validator';
 
 export class CreatePromotionDto {
   @IsString()
@@ -18,11 +18,18 @@ export class CreatePromotionDto {
   @Max(100)
   discount: number;
 
-  @IsDateString()
-  startDate: Date;
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  promotionalPrice?: number;
 
+  @IsOptional()
   @IsDateString()
-  endDate: Date;
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: Date;
 
   @IsBoolean()
   isActive: boolean;

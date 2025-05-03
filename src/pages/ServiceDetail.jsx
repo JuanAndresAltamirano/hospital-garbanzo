@@ -18,7 +18,9 @@ const ServiceDetail = () => {
     const fetchService = async () => {
       try {
         setLoading(true);
+        console.log(`Fetching service with ID: ${id}`);
         const data = await servicesService.getById(id);
+        console.log("Service data received:", data);
         setService(data);
       } catch (err) {
         console.error('Error fetching service:', err);
@@ -31,11 +33,18 @@ const ServiceDetail = () => {
 
     if (id) {
       fetchService();
+    } else {
+      console.error("No service ID provided");
     }
   }, [id]);
 
+  useEffect(() => {
+    // Debug render state
+    console.log("Component state:", { loading, error, service, id });
+  }, [loading, error, service, id]);
+
   const handleBack = () => {
-    navigate('/services');
+    navigate('/servicios');
   };
 
   if (loading) {
@@ -63,6 +72,9 @@ const ServiceDetail = () => {
     );
   }
 
+  // Debug render
+  console.log("Rendering service:", service);
+
   return (
     <div className="service-detail-container">
       <div className="service-detail-header">
@@ -83,6 +95,7 @@ const ServiceDetail = () => {
                   src={`${API_URL.replace('/api', '')}/uploads/${service.image.split('/').pop()}`}
                   alt={service.name}
                   onError={(e) => {
+                    console.error("Image load error:", e);
                     e.target.src = '/placeholder-medical.jpg';
                   }}
                 />
@@ -144,14 +157,17 @@ const ServiceDetail = () => {
               </div>
             </div>
           </div>
-          
-          <div className="service-cta">
-            <h3>¿Necesita más información?</h3>
-            <p>Contáctenos directamente y resolveremos todas sus dudas.</p>
-            <div className="cta-buttons">
-              <a href="/contact" className="contact-button">Contactar</a>
-              <a href="tel:+123456789" className="phone-button">Llamar Ahora</a>
-            </div>
+        </div>
+      </div>
+      
+      {/* CTA section moved outside container for full width */}
+      <div className="service-cta">
+        <div className="container">
+          <h3>¿Necesita más información?</h3>
+          <p>Contáctenos directamente y resolveremos todas sus dudas sobre nuestros servicios de fisioterapia y rehabilitación.</p>
+          <div className="cta-buttons">
+            <a href="/contacto" className="contact-button">Contactar</a>
+            <a href="tel:+123456789" className="phone-button">Llamar Ahora</a>
           </div>
         </div>
       </div>

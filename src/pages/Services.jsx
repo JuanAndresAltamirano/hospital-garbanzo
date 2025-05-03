@@ -32,7 +32,9 @@ import {
   FaDisease,
   FaVirus,
   FaThermometer,
-  FaCheck
+  FaCheck,
+  FaClock,
+  FaTag
 } from 'react-icons/fa';
 import { servicesService } from '../services/servicesService';
 import './Services.css';
@@ -44,6 +46,7 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
   const servicesRef = useRef(null);
+  const serviceCardsRef = useRef([]);
   const navigate = useNavigate();
   
   // Get unique categories from services
@@ -54,6 +57,9 @@ const Services = () => {
 
   useEffect(() => {
     fetchServices();
+    
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
@@ -68,14 +74,13 @@ const Services = () => {
       { threshold: 0.2 }
     );
 
-    const serviceCards = document.querySelectorAll('.service-card');
-    serviceCards.forEach((card) => {
-      observer.observe(card);
+    serviceCardsRef.current.forEach((card) => {
+      if (card) observer.observe(card);
     });
 
     return () => {
-      serviceCards.forEach((card) => {
-        observer.unobserve(card);
+      serviceCardsRef.current.forEach((card) => {
+        if (card) observer.unobserve(card);
       });
     };
   }, [services]);
@@ -86,6 +91,7 @@ const Services = () => {
       // Sort by name
       const sortedData = [...data].sort((a, b) => a.name.localeCompare(b.name));
       setServices(sortedData);
+      serviceCardsRef.current = new Array(sortedData.length);
     } catch (error) {
       console.error('Error fetching services:', error);
       toast.error('Error al cargar los servicios');
@@ -134,6 +140,28 @@ const Services = () => {
     ? services 
     : services.filter(service => service.category === activeCategory);
 
+  // Format category name with first letter uppercase
+  const formatCategoryName = (category) => {
+    if (!category) return 'General';
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  // Get human-readable categories
+  const getCategoryLabel = (category) => {
+    const labels = {
+      'all': 'Todos los servicios',
+      'consultas': 'Consultas médicas',
+      'procedimientos': 'Procedimientos',
+      'emergencias': 'Servicios de emergencia',
+      'diagnostico': 'Diagnóstico',
+      'laboratorio': 'Laboratorio',
+      'cirugia': 'Cirugía',
+      'especialidades': 'Especialidades'
+    };
+    
+    return labels[category] || formatCategoryName(category);
+  };
+
   const handleServiceDetails = (serviceId) => {
     navigate(`/services/${serviceId}`);
   };
@@ -157,23 +185,115 @@ const Services = () => {
         <div className="container">
           <h1>Nuestros Servicios</h1>
           <p className="services-intro">
-            En Hospital Garbanzo ofrecemos una amplia gama de servicios médicos con los más altos estándares de calidad y tecnología de vanguardia para el cuidado integral de su salud.
+            En el Centro de Especialidades Médicas Dr. Marco V. Mullo ofrecemos una amplia gama de servicios médicos con los más altos estándares de calidad y tecnología de vanguardia para el cuidado integral de su salud.
           </p>
         </div>
       </div>
 
       <div className="container">
         {services.length === 0 ? (
-          <div className="services-empty">
-            <div className="services-empty-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12" y2="16"></line>
-              </svg>
+          <div className="services-list">
+            <h2 className="section-title">Portafolio de Servicios</h2>
+            
+            <div className="services-grid">
+              <div className="service-card" ref={el => serviceCardsRef.current[0] = el}>
+                <div className="service-icon">{getIcon('stethoscope')}</div>
+                <h3>Medicina General</h3>
+                <p>Atención médica integral para el diagnóstico y tratamiento de diversas condiciones de salud.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[1] = el}>
+                <div className="service-icon">{getIcon('female')}</div>
+                <h3>Obstetricia</h3>
+                <p>Atención especializada para el cuidado durante el embarazo, parto y postparto.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[2] = el}>
+                <div className="service-icon">{getIcon('teeth')}</div>
+                <h3>Odontología</h3>
+                <p>Servicios dentales completos para mantener la salud bucal y prevenir enfermedades.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[3] = el}>
+                <div className="service-icon"><FaTeeth /></div>
+                <h3>Endodoncia</h3>
+                <p>Tratamiento especializado para problemas del interior del diente y tejidos pulpares.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[4] = el}>
+                <div className="service-icon"><FaTeeth /></div>
+                <h3>Ortodoncia</h3>
+                <p>Corrección de la posición de los dientes y mejora de la mordida para una sonrisa saludable.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[5] = el}>
+                <div className="service-icon"><FaTeeth /></div>
+                <h3>Diseño de sonrisa</h3>
+                <p>Procedimientos estéticos para mejorar la apariencia de su sonrisa de manera personalizada.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[6] = el}>
+                <div className="service-icon">{getIcon('baby')}</div>
+                <h3>Pediatría</h3>
+                <p>Atención médica especializada para niños, desde recién nacidos hasta adolescentes.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[7] = el}>
+                <div className="service-icon">{getIcon('syringe')}</div>
+                <h3>Vacunatorio</h3>
+                <p>Administración de vacunas para la prevención de enfermedades en niños y adultos.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[8] = el}>
+                <div className="service-icon">{getIcon('flask')}</div>
+                <h3>Laboratorio clínico</h3>
+                <p>Análisis de muestras para diagnóstico y seguimiento de diversas condiciones médicas.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[9] = el}>
+                <div className="service-icon">{getIcon('xray')}</div>
+                <h3>Imagenología</h3>
+                <p>Técnicas de diagnóstico por imagen para evaluar órganos y estructuras internas.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[10] = el}>
+                <div className="service-icon">{getIcon('wheelchair')}</div>
+                <h3>Rehabilitación física</h3>
+                <p>Terapias para recuperar la función y movimiento después de lesiones o cirugías.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[11] = el}>
+                <div className="service-icon">{getIcon('pills')}</div>
+                <h3>Farmacia</h3>
+                <p>Dispensación de medicamentos con asesoramiento profesional para su tratamiento.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[12] = el}>
+                <div className="service-icon">{getIcon('bandaid')}</div>
+                <h3>Traumatología</h3>
+                <p>Diagnóstico y tratamiento de lesiones y enfermedades del sistema musculoesquelético.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
+              
+              <div className="service-card" ref={el => serviceCardsRef.current[13] = el}>
+                <div className="service-icon">{getIcon('notes')}</div>
+                <h3>Sala de procedimientos</h3>
+                <p>Área especializada para realizar procedimientos médicos menores con todas las medidas de seguridad.</p>
+                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+              </div>
             </div>
-            <h3>Aún no hay servicios disponibles</h3>
-            <p>Pronto publicaremos información sobre nuestros servicios médicos.</p>
           </div>
         ) : (
           <>
@@ -185,24 +305,22 @@ const Services = () => {
                     className={`filter-btn ${activeCategory === category ? 'active' : ''}`}
                     onClick={() => setActiveCategory(category)}
                   >
-                    {category === 'all' ? 'Todos' : category}
+                    {getCategoryLabel(category)}
                   </button>
                 ))}
               </div>
             )}
 
             <div className="services-grid">
-              {filteredServices.map((service) => (
+              {filteredServices.map((service, index) => (
                 <div 
                   className="service-card" 
                   key={service.id}
+                  ref={el => serviceCardsRef.current[index] = el}
                   data-category={service.category}
+                  onClick={() => handleServiceDetails(service.id)}
                 >
-                  <div className="service-icon">
-                    {getIcon(service.icon)}
-                  </div>
-                  
-                  {service.image && (
+                  {service.image ? (
                     <div className="service-image">
                       <img
                         src={`${API_URL.replace('/api', '')}/uploads/${service.image.split('/').pop()}`}
@@ -212,17 +330,29 @@ const Services = () => {
                         }}
                         loading="lazy"
                       />
+                      <div className="service-icon">
+                        {getIcon(service.icon)}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="service-icon-large">
+                      {getIcon(service.icon)}
                     </div>
                   )}
                   
                   <div className="service-content">
                     <h3>{service.name}</h3>
-                   {/* <p>{service.description}</p> */}
+                    <p>{service.description ? service.description.substring(0, 120) + (service.description.length > 120 ? '...' : '') : 'Información detallada disponible al hacer clic.'}</p>
                     
-                    <button 
-                      className="service-btn"
-                      onClick={() => handleServiceDetails(service.id)}
-                    >
+                    <div className="service-meta">
+                      {service.category && (
+                        <span className="service-category">
+                          <FaTag /> {formatCategoryName(service.category)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <button className="service-btn">
                       Más Información
                     </button>
                   </div>

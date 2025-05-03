@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './contexts/AuthContext';
@@ -14,6 +14,12 @@ import Admin from './pages/Admin';
 import PasswordRecovery from './pages/PasswordRecovery';
 import PasswordReset from './pages/PasswordReset';
 import './styles/globals.css';
+
+// Redirect component for services
+function ServiceRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/servicios/${id}`} replace />;
+}
 
 function AppContent() {
   const location = useLocation();
@@ -34,6 +40,9 @@ function AppContent() {
           <Route path="/admin/*" element={<Admin />} />
           <Route path="/recuperar-contrasena" element={<PasswordRecovery />} />
           <Route path="/restablecer-contrasena" element={<PasswordReset />} />
+          
+          {/* Redirects for English routes to Spanish routes */}
+          <Route path="/services/:id" element={<ServiceRedirect />} />
         </Routes>
       </main>
       <ToastContainer position="bottom-right" />

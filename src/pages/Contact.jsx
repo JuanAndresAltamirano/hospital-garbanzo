@@ -280,6 +280,18 @@ const Contact = () => {
     };
 
     fetchGalleryData();
+    
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
+    // Set initial sections as visible after a delay
+    setTimeout(() => {
+      setIsIntersecting({
+        info: true,
+        map: true,
+        gallery: true
+      });
+    }, 300);
   }, []);
 
   useEffect(() => {
@@ -358,19 +370,14 @@ const Contact = () => {
 
   return (
     <div className="contact-page">
-      <section className="contact-hero">
-        <div className="contact-hero-content">
+      <div className="contact-hero">
+        <div className="container">
           <h1>Contacto</h1>
-          <p>Estamos aquí para atender sus consultas y brindarle la mejor atención</p>
-
-          {/* Scroll indicator 
-          <div className="hero-scroll-indicator">
-            <div className="scroll-arrow"></div>
-            <span>Desplazar para más información</span>
-          </div>
-          */}
+          <p className="contact-intro">
+            Estamos aquí para atender sus consultas y brindarle la mejor atención
+          </p>
         </div>
-      </section>
+      </div>
 
       <section className={`contact-info-section ${isIntersecting.info ? 'animate-in' : ''}`}>
         <div className="container">
@@ -385,7 +392,7 @@ const Contact = () => {
               <h3>Dirección</h3>
               <p>Vía Aguarico y Calle Chile</p>
               <p>Referencia: Frente al Parque Central</p>
-              <a href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" className="contact-link" target="_blank" rel="noopener noreferrer">
+              <a href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" className="contact-link btn btn-primary" target="_blank" rel="noopener noreferrer">
                 Ver en Google Maps <FaChevronRight />
               </a>
             </div>
@@ -397,7 +404,7 @@ const Contact = () => {
               <h3>Teléfonos</h3>
               <p>+593 99 123 4567</p>
               <p>+593 2 345 6789</p>
-              <a href="tel:+593991234567" className="contact-link">
+              <a href="tel:+593991234567" className="contact-link btn btn-primary">
                 Llamar ahora <FaChevronRight />
               </a>
             </div>
@@ -407,9 +414,8 @@ const Contact = () => {
                 <FaEnvelope />
               </div>
               <h3>Correo Electrónico</h3>
-              <p>maryelenaobando79@yahoo.es</p>
               <p>citas@hospitalmullo.com</p>
-              <a href="mailto:maryelenaobando79@yahoo.es" className="contact-link">
+              <a href="mailto:maryelenaobando79@yahoo.es" className="contact-link btn btn-primary">
                 Enviar email <FaChevronRight />
               </a>
             </div>
@@ -422,7 +428,7 @@ const Contact = () => {
               <div className="social-links">
                 <a href="https://www.instagram.com/centrodeespecialidadesmvm_/" className="social-link" target="_blank" rel="noopener noreferrer">
                   <FaInstagram />
-                  <span>@centrodeespecialidadesmvm_</span>
+                  <span>Instagram</span>
                 </a>
                 <a href="https://www.facebook.com/profile.php?id=100010625824060" className="social-link" target="_blank" rel="noopener noreferrer">
                   <FaFacebook />
@@ -435,7 +441,7 @@ const Contact = () => {
       </section>
 
       {/* Using the Categorized Gallery component */}
-      <div className={`${isIntersecting.gallery ? 'animate-in' : ''}`}>
+      <section className={`gallery-section ${isIntersecting.gallery ? 'animate-in' : ''}`}>
         {loading ? (
           <div className="loading-gallery">
             <p>Cargando galería...</p>
@@ -448,7 +454,7 @@ const Contact = () => {
             onImageClick={openGallery}
           />
         )}
-      </div>
+      </section>
 
       {/* Gallery Modal */}
       <GalleryModal 
@@ -483,13 +489,13 @@ const Contact = () => {
               </div>
               <div className="map-info">
                 <div className="map-address">
-                  <h3>Centro de Especialidades Médicas Dr. Marco Vinicio Mullo</h3>
+                  <h3>Centro de Especialidades Médicas Dr. Marco V. Mullo</h3>
                   <p><FaMapMarkerAlt /> Vía Aguarico y Calle Chile</p>
                   <p>Lago Agrio, Ecuador</p>
                   <div className="map-actions">
                     <a 
                       href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" 
-                      className="action-btn" 
+                      className="action-btn btn btn-primary" 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >

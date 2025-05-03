@@ -695,7 +695,7 @@
 
 /* Gallery Section */
 .gallery-section {
-  padding: 4rem 2rem;
+  padding: 3rem 0;
   background-color: #4f8a8c;
   position: relative;
   overflow: hidden;
@@ -769,6 +769,7 @@
   display: block;
   opacity: 1;
   transform: translateY(0);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .gallery-category-description {
@@ -814,7 +815,8 @@
   overflow: hidden;
   aspect-ratio: 16 / 10;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
-  flex: 1;
+  flex: 0 0 250px;
+  height: 250px;
 }
 
 .gallery-image-container::after {
@@ -1301,7 +1303,7 @@
   }
   
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
   }
   
@@ -1487,4 +1489,75 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Gallery subcategories */
+.gallery-subcategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem 0;
+  justify-content: center;
+  background-color: var(--color-bg-light);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.gallery-subcategory-btn {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.4rem 1.2rem;
+  transition: all 0.2s ease;
+  font-weight: 400;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.gallery-subcategory-btn:hover {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-subcategory-btn.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(var(--color-accent-rgb), 0.3);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No images message */
+.no-images-message {
+  grid-column: 1 / -1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  margin: 2rem 0;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.no-images-message p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
 } 

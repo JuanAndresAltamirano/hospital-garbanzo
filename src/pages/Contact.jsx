@@ -46,6 +46,42 @@ const fallbackGallery = {
           alt: "Exterior del Hospital",
           caption: "Vista del exterior del Centro Médico"
         }
+      ],
+      subcategories: [
+        {
+          id: "exteriores",
+          name: "Exteriores",
+          description: "Vistas de las instalaciones exteriores del hospital",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&q=80",
+              alt: "Fachada Principal",
+              caption: "Entrada principal al Centro Médico"
+            },
+            {
+              src: "https://images.unsplash.com/photo-1581360742512-021d5b2157d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGhvc3BpdGFsfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+              alt: "Vista Lateral",
+              caption: "Vista lateral del Centro Médico"
+            }
+          ]
+        },
+        {
+          id: "interiores",
+          name: "Interiores",
+          description: "Espacios interiores diseñados para la comodidad de nuestros pacientes",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80",
+              alt: "Recepción",
+              caption: "Área de recepción y espera para pacientes"
+            },
+            {
+              src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fGhvc3BpdGFsJTIwcm9vbXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+              alt: "Sala de Espera",
+              caption: "Cómoda área de espera para pacientes y familiares"
+            }
+          ]
+        }
       ]
     },
     {
@@ -63,6 +99,32 @@ const fallbackGallery = {
           alt: "Sala de examen",
           caption: "Sala de exámenes médicos"
         }
+      ],
+      subcategories: [
+        {
+          id: "medicina-general",
+          name: "Medicina General",
+          description: "Consultorios para atención médica general",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1504439468489-c8920d796a29?auto=format&fit=crop&q=80",
+              alt: "Consultorio General",
+              caption: "Consultorio de medicina general"
+            }
+          ]
+        },
+        {
+          id: "especialidades",
+          name: "Especialidades",
+          description: "Consultorios para diferentes especialidades médicas",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGRvY3RvciUyMG9mZmljZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+              alt: "Consultorio Especializado",
+              caption: "Consultorio para especialidades médicas"
+            }
+          ]
+        }
       ]
     },
     {
@@ -75,32 +137,155 @@ const fallbackGallery = {
           alt: "Equipo de diagnóstico",
           caption: "Equipos modernos para diagnósticos precisos"
         }
+      ],
+      subcategories: [
+        {
+          id: "diagnostico",
+          name: "Equipos de Diagnóstico",
+          description: "Equipos modernos para diagnósticos precisos",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bWVkaWNhbCUyMGVxdWlwbWVudHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+              alt: "Equipo Diagnóstico",
+              caption: "Equipamiento para diagnósticos médicos"
+            }
+          ]
+        },
+        {
+          id: "tratamiento",
+          name: "Equipos de Tratamiento",
+          description: "Tecnología avanzada para tratamientos médicos",
+          images: [
+            {
+              src: "https://images.unsplash.com/photo-1597764690523-15bea4c581c9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8bWVkaWNhbCUyMGVxdWlwbWVudHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+              alt: "Equipo Terapéutico",
+              caption: "Equipo para tratamientos médicos especializados"
+            }
+          ]
+        }
       ]
     }
   ],
   // Function to get all images flattened (for the modal view)
   getAllImages: function() {
-    return this.categories.reduce((allImages, category) => {
-      return [...allImages, ...category.images.map(img => ({
-        ...img,
-        category: category.name
-      }))];
-    }, []);
+    let allImages = [];
+    
+    this.categories.forEach(category => {
+      // Add images from main category
+      if (category.images) {
+        allImages = [...allImages, ...category.images.map(img => ({
+          ...img,
+          category: category.name
+        }))];
+      }
+      
+      // Add images from subcategories
+      if (category.subcategories) {
+        category.subcategories.forEach(subcategory => {
+          if (subcategory.images) {
+            allImages = [...allImages, ...subcategory.images.map(img => ({
+              ...img,
+              category: category.name,
+              subcategory: subcategory.name
+            }))];
+          }
+        });
+      }
+    });
+    
+    return allImages;
   }
 };
 
 // Categorized Gallery component
 const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
   const [activeCategory, setActiveCategory] = useState(null);
+  const [activeSubcategory, setActiveSubcategory] = useState(null);
+  const [subcategoryImages, setSubcategoryImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
   
   // Set first category as active by default
   useEffect(() => {
     if (categories && categories.length > 0 && !activeCategory) {
       setActiveCategory(categories[0].id);
+      
+      // If the category has subcategories, set the first one as active
+      const firstCategory = categories[0];
+      if (firstCategory.subcategories && firstCategory.subcategories.length > 0) {
+        setActiveSubcategory(firstCategory.subcategories[0].id);
+      } else {
+        setActiveSubcategory(null);
+      }
     }
   }, [categories]);
   
+  // When changing category, reset subcategory
+  useEffect(() => {
+    if (activeCategory) {
+      const category = categories.find(cat => cat.id === activeCategory);
+      if (category && category.subcategories && category.subcategories.length > 0) {
+        setActiveSubcategory(category.subcategories[0].id);
+      } else {
+        setActiveSubcategory(null);
+        setSubcategoryImages([]);
+      }
+    }
+  }, [activeCategory, categories]);
+  
+  // Fetch images when subcategory changes
+  useEffect(() => {
+    if (activeCategory && activeSubcategory) {
+      const loadSubcategoryImages = async () => {
+        setLoadingImages(true);
+        try {
+          const images = await galleryService.getSubcategoryImages(activeCategory, activeSubcategory);
+          setSubcategoryImages(images);
+        } catch (error) {
+          console.error("Error loading subcategory images:", error);
+          // Fallback to subcategory images from the categories data
+          const category = categories.find(cat => cat.id === activeCategory);
+          const subcategory = category?.subcategories?.find(sub => sub.id === activeSubcategory);
+          setSubcategoryImages(subcategory?.images || []);
+        } finally {
+          setLoadingImages(false);
+        }
+      };
+      
+      loadSubcategoryImages();
+    } else {
+      setSubcategoryImages([]);
+    }
+  }, [activeCategory, activeSubcategory, categories]);
+  
   if (!categories || categories.length === 0) return null;
+  
+  // Get current category object
+  const currentCategory = categories.find(cat => cat.id === activeCategory);
+  
+  // Check if current category has subcategories
+  const hasSubcategories = currentCategory && 
+                          currentCategory.subcategories && 
+                          currentCategory.subcategories.length > 0;
+  
+  // Get images to display based on whether we're showing subcategories or not
+  const getImagesToDisplay = () => {
+    if (!currentCategory) return [];
+    
+    if (hasSubcategories && activeSubcategory) {
+      // If we have loaded images from the API, use those
+      if (subcategoryImages.length > 0) {
+        return subcategoryImages;
+      }
+      
+      // Otherwise fall back to the subcategory images from the initial data
+      const subcategory = currentCategory.subcategories.find(
+        sub => sub.id === activeSubcategory
+      );
+      return subcategory ? subcategory.images : [];
+    }
+    
+    return currentCategory.images || [];
+  };
   
   return (
     <section className="gallery-section animate-in">
@@ -120,68 +305,127 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
           ))}
         </div>
         
-        {categories.map(category => (
-          <div 
-            key={category.id} 
-            className={`gallery-category-content ${activeCategory === category.id ? 'active' : ''}`}
-          >
-            <p className="gallery-category-description">{category.description}</p>
-            
-            <div className="gallery-grid">
-              {category.images.map((image, imageIndex) => {
-                // Group images by item (assuming images for the same item have consecutive indices)
-                // This logic can be adjusted based on your data structure
-                const hasMultipleImages = category.images.length > 1;
-                
-                return (
-                  <div 
-                    className="gallery-item" 
-                    key={imageIndex} 
-                    onClick={() => onImageClick(category.id, imageIndex)}
-                  >
-                    <div className={`gallery-image-container ${hasMultipleImages ? 'has-multiple' : ''}`}>
-                      <img 
-                        src={image.src} 
-                        alt={image.alt || 'Imagen de galería'} 
-                        loading="lazy"
-                        onError={(e) => {
-                          console.error('Image failed to load:', image.src);
-                          e.target.onerror = null; // Prevent infinite callback loop
-                          e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
-                        }}
-                      />
-                      {hasMultipleImages && (
-                        <div className="gallery-corner-indicator">
-                          <FaImages /> {category.images.length}
-                        </div>
-                      )}
-                      <div className="gallery-overlay">
-                        <FaImage />
-                        <span>Ver imagen</span>
-                      </div>
-                    </div>
-                    {image.caption && <div className="gallery-caption">{image.caption}</div>}
-                  </div>
-                );
-              })}
-            </div>
+        {/* Show subcategories if available */}
+        {hasSubcategories && (
+          <div className="gallery-subcategories">
+            {currentCategory.subcategories.map(subcategory => (
+              <button 
+                key={subcategory.id}
+                className={`gallery-subcategory-btn ${activeSubcategory === subcategory.id ? 'active' : ''}`}
+                onClick={() => setActiveSubcategory(subcategory.id)}
+              >
+                {subcategory.name}
+              </button>
+            ))}
           </div>
-        ))}
+        )}
+        
+        {/* Display current category description */}
+        <div className="gallery-category-content active">
+          {hasSubcategories && activeSubcategory ? (
+            <p className="gallery-category-description">
+              {currentCategory.subcategories.find(sub => sub.id === activeSubcategory)?.description || ''}
+            </p>
+          ) : (
+            <p className="gallery-category-description">{currentCategory?.description || ''}</p>
+          )}
+          
+          {loadingImages ? (
+            <div className="loading-gallery">
+              <p>Cargando imágenes</p>
+            </div>
+          ) : (
+            <div className="gallery-grid">
+              {getImagesToDisplay().length === 0 ? (
+                <div className="no-images-message">
+                  <p>No hay imágenes disponibles para esta categoría</p>
+                </div>
+              ) : (
+                getImagesToDisplay().map((image, imageIndex) => {
+                  // Group images by item (assuming images for the same item have consecutive indices)
+                  const hasMultipleImages = getImagesToDisplay().length > 1;
+                  
+                  return (
+                    <div 
+                      className="gallery-item" 
+                      key={imageIndex} 
+                      onClick={() => onImageClick(
+                        activeCategory, 
+                        imageIndex,
+                        activeSubcategory // Pass subcategory ID if applicable
+                      )}
+                    >
+                      <div className={`gallery-image-container ${hasMultipleImages ? 'has-multiple' : ''}`}>
+                        <img 
+                          src={image.src} 
+                          alt={image.alt || 'Imagen de galería'} 
+                          loading="lazy"
+                          onError={(e) => {
+                            console.error('Image failed to load:', image.src);
+                            e.target.onerror = null; // Prevent infinite callback loop
+                            e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
+                          }}
+                        />
+                        {hasMultipleImages && (
+                          <div className="gallery-corner-indicator">
+                            <FaImages /> {getImagesToDisplay().length}
+                          </div>
+                        )}
+                        <div className="gallery-overlay">
+                          <FaImage />
+                          <span>Ver imagen</span>
+                        </div>
+                      </div>
+                      {image.caption && <div className="gallery-caption">{image.caption}</div>}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
 };
 
 // Gallery Modal component
-const GalleryModal = ({ isOpen, categories, currentCategory, currentIndex, onClose, onNext, onPrev }) => {
+const GalleryModal = ({ isOpen, categories, subcategoryImages, currentCategory, currentSubcategory, currentIndex, onClose, onNext, onPrev }) => {
   if (!isOpen || !categories || categories.length === 0) return null;
   
   // Find the current category by ID
   const category = categories.find(cat => cat.id === currentCategory);
   if (!category) return null;
   
-  // Use only images from the selected category
-  const images = category.images;
+  // Use images from subcategory if available, otherwise use category images
+  let images;
+  let displayTitle = category.name;
+  
+  if (currentSubcategory) {
+    // If we have subcategory images from API, use those
+    if (subcategoryImages && subcategoryImages.length > 0) {
+      images = subcategoryImages;
+      // Look up subcategory name
+      const subcategory = category.subcategories?.find(sub => sub.id === currentSubcategory);
+      if (subcategory) {
+        displayTitle = `${category.name} - ${subcategory.name}`;
+      }
+    } else if (category.subcategories) {
+      // Fall back to embedded subcategory images
+      const subcategory = category.subcategories.find(sub => sub.id === currentSubcategory);
+      if (subcategory) {
+        images = subcategory.images;
+        displayTitle = `${category.name} - ${subcategory.name}`;
+      } else {
+        images = category.images;
+      }
+    } else {
+      images = category.images;
+    }
+  } else {
+    images = category.images;
+  }
+  
   if (!images || images.length === 0) return null;
   
   const handleKeyDown = (e) => {
@@ -217,7 +461,7 @@ const GalleryModal = ({ isOpen, categories, currentCategory, currentIndex, onClo
       <div className="gallery-modal-overlay" onClick={onClose}></div>
       
       <div className="gallery-modal-container">
-        <div className="gallery-category-top">{category.name.toUpperCase()}</div>
+        <div className="gallery-category-top">{displayTitle.toUpperCase()}</div>
         
         <div className="gallery-image-area">
           <img 
@@ -254,6 +498,8 @@ const Contact = () => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [currentCategory, setCurrentCategory] = useState(null);
+  const [currentSubcategory, setCurrentSubcategory] = useState(null);
+  const [subcategoryImages, setSubcategoryImages] = useState([]);
   const [isIntersecting, setIsIntersecting] = useState({
     info: false,
     map: false,
@@ -340,9 +586,27 @@ const Contact = () => {
     };
   }, [loading]);
 
-  const openGallery = (categoryId, imageIndex) => {
+  const openGallery = async (categoryId, imageIndex, subcategoryId = null) => {
     setCurrentCategory(categoryId);
+    setCurrentSubcategory(subcategoryId);
     setCurrentImage(imageIndex);
+    
+    // If a subcategory is selected, fetch its images
+    if (subcategoryId) {
+      try {
+        const images = await galleryService.getSubcategoryImages(categoryId, subcategoryId);
+        setSubcategoryImages(images);
+      } catch (error) {
+        console.error("Error loading subcategory images for gallery:", error);
+        // Fallback to subcategory images from the categories data
+        const category = galleryData.categories.find(cat => cat.id === categoryId);
+        const subcategory = category?.subcategories?.find(sub => sub.id === subcategoryId);
+        setSubcategoryImages(subcategory?.images || []);
+      }
+    } else {
+      setSubcategoryImages([]);
+    }
+    
     setGalleryOpen(true);
     document.body.style.overflow = 'hidden';
   };
@@ -357,7 +621,24 @@ const Contact = () => {
     const category = galleryData.categories.find(cat => cat.id === currentCategory);
     if (!category) return;
     
-    setCurrentImage((prev) => (prev === category.images.length - 1 ? 0 : prev + 1));
+    let images;
+    if (currentSubcategory) {
+      // Use fetched subcategory images if available
+      if (subcategoryImages && subcategoryImages.length > 0) {
+        images = subcategoryImages;
+      } else if (category.subcategories) {
+        const subcategory = category.subcategories.find(sub => sub.id === currentSubcategory);
+        images = subcategory ? subcategory.images : category.images;
+      } else {
+        images = category.images;
+      }
+    } else {
+      images = category.images;
+    }
+    
+    if (!images || images.length === 0) return;
+    
+    setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = (e) => {
@@ -365,7 +646,24 @@ const Contact = () => {
     const category = galleryData.categories.find(cat => cat.id === currentCategory);
     if (!category) return;
     
-    setCurrentImage((prev) => (prev === 0 ? category.images.length - 1 : prev - 1));
+    let images;
+    if (currentSubcategory) {
+      // Use fetched subcategory images if available
+      if (subcategoryImages && subcategoryImages.length > 0) {
+        images = subcategoryImages;
+      } else if (category.subcategories) {
+        const subcategory = category.subcategories.find(sub => sub.id === currentSubcategory);
+        images = subcategory ? subcategory.images : category.images;
+      } else {
+        images = category.images;
+      }
+    } else {
+      images = category.images;
+    }
+    
+    if (!images || images.length === 0) return;
+    
+    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   return (
@@ -460,7 +758,9 @@ const Contact = () => {
       <GalleryModal 
         isOpen={galleryOpen}
         categories={galleryData.categories}
+        subcategoryImages={subcategoryImages}
         currentCategory={currentCategory}
+        currentSubcategory={currentSubcategory}
         currentIndex={currentImage}
         onClose={closeGallery}
         onNext={nextImage}

@@ -138,4 +138,12 @@ export class GalleryController {
   updateImageOrder(@Body() body: { imageIds: number[] }) {
     return this.galleryService.updateImageOrder(body.imageIds);
   }
+
+  @Get('categories/:categoryId/subcategories/:subcategoryId/images')
+  getImagesBySubcategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('subcategoryId', ParseIntPipe) subcategoryId: number
+  ) {
+    return this.galleryService.findImagesBySubcategory(categoryId, subcategoryId);
+  }
 } 

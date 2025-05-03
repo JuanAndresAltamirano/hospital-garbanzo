@@ -198,4 +198,24 @@ export class GalleryService {
     
     return this.findAllImages();
   }
+
+  async findImagesBySubcategory(categoryId: number, subcategoryId: number) {
+    // First, check if the subcategory exists and belongs to the category
+    const subcategory = await this.categoriesRepository.findOne({
+      where: { id: subcategoryId, parentId: categoryId },
+      relations: ['images'],
+      order: {
+        images: {
+          order: 'ASC',
+        },
+      },
+    });
+
+    if (!subcategory) {
+      throw new NotFoundException(`Subcategory with ID ${subcategoryId} not found in category ${categoryId}`);
+    }
+
+    // Return the images
+    return subcategory.images || [];
+  }
 } 

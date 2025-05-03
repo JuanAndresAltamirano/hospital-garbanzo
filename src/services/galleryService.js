@@ -122,32 +122,81 @@ export const galleryService = {
     return response.data;
   },
 
+  // Fetch images for a subcategory
+  getSubcategoryImages: async (categoryId, subcategoryId) => {
+    try {
+      const response = await apiService.get(`/gallery/categories/${categoryId}/subcategories/${subcategoryId}/images`);
+      
+      return response.data.map(image => ({
+        id: image.id,
+        src: image.src,
+        alt: image.alt || '',
+        caption: image.caption || ''
+      }));
+    } catch (error) {
+      console.error(`Error fetching images for subcategory ${subcategoryId}:`, error);
+      return [];
+    }
+  },
+
   // Gallery data for Contact page
   getGalleryDataForContact: async () => {
     try {
-      const categories = await galleryService.getAllCategories();
+      const categories = await apiService.get('/gallery/categories');
       
+      // Format data for the frontend gallery
       const formattedGallery = {
         title: "Galería de Imágenes",
         subtitle: "Conozca nuestras instalaciones y servicios a través de nuestra galería",
-        categories: categories.map(category => ({
+        categories: categories.data.map(category => ({
           id: category.id.toString(),
           name: category.name,
           description: category.description,
-          images: category.images.map(image => ({
+          images: category.images?.map(image => ({
             id: image.id,
             src: image.src,
             alt: image.alt || '',
             caption: image.caption || ''
-          }))
+          })) || [],
+          subcategories: category.subcategories?.map(subcategory => ({
+            id: subcategory.id.toString(),
+            name: subcategory.name,
+            description: subcategory.description,
+            images: subcategory.images?.map(image => ({
+              id: image.id,
+              src: image.src,
+              alt: image.alt || '',
+              caption: image.caption || ''
+            })) || []
+          })) || []
         })),
         getAllImages: function() {
-          return this.categories.reduce((allImages, category) => {
-            return [...allImages, ...category.images.map(img => ({
-              ...img,
-              category: category.name
-            }))];
-          }, []);
+          let allImages = [];
+          
+          this.categories.forEach(category => {
+            // Add images from main category
+            if (category.images) {
+              allImages = [...allImages, ...category.images.map(img => ({
+                ...img,
+                category: category.name
+              }))];
+            }
+            
+            // Add images from subcategories
+            if (category.subcategories) {
+              category.subcategories.forEach(subcategory => {
+                if (subcategory.images) {
+                  allImages = [...allImages, ...subcategory.images.map(img => ({
+                    ...img,
+                    category: category.name,
+                    subcategory: subcategory.name
+                  }))];
+                }
+              });
+            }
+          });
+          
+          return allImages;
         }
       };
       

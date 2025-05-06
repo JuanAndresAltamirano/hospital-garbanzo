@@ -190,7 +190,7 @@ server {
     
     # Frontend
     location / {
-        root /var/www/html;
+        root /usr/share/nginx/html;
         index index.html index.htm;
         try_files \$uri \$uri/ /index.html;
     }
@@ -275,4 +275,4 @@ echo "$COMPOSE_CMD -f docker-compose.prod.yml logs -f [service_name]"
 echo ""
 echo "To stop services:"
 echo "$COMPOSE_CMD -f docker-compose.prod.yml down"
-echo "=========================================" 
+echo "==========================================" 

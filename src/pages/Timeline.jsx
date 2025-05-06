@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
+import { FaPlay, FaVideo, FaExternalLinkAlt } from 'react-icons/fa';
 import timelineService from '../services/timelineService';
 import './Timeline.css';
 
@@ -23,11 +24,57 @@ const defaultTimelineEntries = [
   }
 ];
 
+// Function to extract TikTok embed code from URL
+const getTikTokEmbedCode = (url) => {
+  if (!url) return null;
+  
+  try {
+    // Check if it's a TikTok URL
+    if (url.includes('tiktok.com')) {
+      // Extract video ID
+      const regex = /\/video\/(\d+)/;
+      const match = url.match(regex);
+      
+      if (match && match[1]) {
+        const videoId = match[1];
+        return `<blockquote class="tiktok-embed" cite="${url}" data-video-id="${videoId}" style="max-width: 605px; min-width: 325px;">
+          <section></section>
+        </blockquote>
+        <script async src="https://www.tiktok.com/embed.js"></script>`;
+      }
+    }
+    
+    // For YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      let videoId = '';
+      
+      if (url.includes('youtube.com/watch')) {
+        const urlParams = new URLSearchParams(new URL(url).search);
+        videoId = urlParams.get('v');
+      } else if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split('?')[0];
+      }
+      
+      if (videoId) {
+        return `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      }
+    }
+    
+    // Default for other video platforms - just show a link
+    return null;
+  } catch (error) {
+    console.error('Error parsing video URL:', error);
+    return null;
+  }
+};
+
 const Timeline = () => {
   const [timelines, setTimelines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeVideoId, setActiveVideoId] = useState(null);
   const timelineRef = useRef(null);
+  const videoRefs = useRef({});
 
   useEffect(() => {
     fetchTimelines();
@@ -57,6 +104,34 @@ const Timeline = () => {
     };
   }, [timelines]);
 
+  // Effect to load TikTok script when needed
+  useEffect(() => {
+    if (activeVideoId) {
+      const videoContainer = videoRefs.current[activeVideoId];
+      if (videoContainer) {
+        // For TikTok videos
+        if (videoContainer.querySelector('.tiktok-embed')) {
+          // Check if TikTok script is already loaded
+          if (window.tiktokScriptLoaded) {
+            // Call the TikTok embed script function manually
+            if (window.tiktok && window.tiktok.embed) {
+              window.tiktok.embed.reload();
+            }
+          } else {
+            // Load TikTok script
+            const script = document.createElement('script');
+            script.src = 'https://www.tiktok.com/embed.js';
+            script.async = true;
+            script.onload = () => {
+              window.tiktokScriptLoaded = true;
+            };
+            document.body.appendChild(script);
+          }
+        }
+      }
+    }
+  }, [activeVideoId]);
+
   const fetchTimelines = async () => {
     try {
       const data = await timelineService.getAll();
@@ -84,6 +159,78 @@ const Timeline = () => {
   const getImageUrl = (imageName) => {
     if (!imageName) return null;
     return `${BASE_URL}/uploads/${imageName}`;
+  };
+
+  // Function to toggle video playback
+  const toggleVideo = (id) => {
+    setActiveVideoId(activeVideoId === id ? null : id);
+  };
+
+  // Function to determine if the entry has media (image or video)
+  const hasMedia = (entry) => {
+    return entry.image || entry.videoUrl;
+  };
+
+  // Function to render the appropriate media for an entry
+  const renderMedia = (entry) => {
+    if (entry.videoUrl) {
+      const embedCode = getTikTokEmbedCode(entry.videoUrl);
+      
+      return (
+        <div 
+          className={`timeline-media timeline-video ${activeVideoId === entry.id ? 'active' : ''}`}
+          onClick={() => toggleVideo(entry.id)}
+        >
+          {activeVideoId === entry.id ? (
+            <div 
+              className="video-embed-container" 
+              ref={el => videoRefs.current[entry.id] = el}
+              dangerouslySetInnerHTML={{ __html: embedCode || '' }}
+            />
+          ) : (
+            <>
+              <div className="video-preview">
+                <div className="play-button">
+                  <FaPlay />
+                </div>
+                <div className="video-info">
+                  <FaVideo />
+                  <span>Ver video</span>
+                </div>
+              </div>
+              {!embedCode && (
+                <a 
+                  href={entry.videoUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="external-video-link"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FaExternalLinkAlt /> Ver en sitio original
+                </a>
+              )}
+            </>
+          )}
+        </div>
+      );
+    } else if (entry.image) {
+      return (
+        <div className="timeline-media">
+          <img
+            src={getImageUrl(entry.image)}
+            alt={`${entry.title} - Año ${entry.year}`}
+            loading="lazy"
+            onError={(e) => {
+              console.error('Timeline image load error:', e.target.src);
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.style.display = 'none'; // Hide broken images in mobile
+            }}
+          />
+        </div>
+      );
+    }
+    
+    return null;
   };
 
   if (loading) {
@@ -132,20 +279,7 @@ const Timeline = () => {
                 <span className="timeline-year-mobile">{event.year}</span>
                 <h3 className="timeline-title">{event.title}</h3>
                 
-                {event.image && (
-                  <div className="timeline-media">
-                    <img
-                      src={getImageUrl(event.image)}
-                      alt={`${event.title} - Año ${event.year}`}
-                      loading="lazy"
-                      onError={(e) => {
-                        console.error('Timeline image load error:', e.target.src);
-                        e.target.onerror = null; // Prevent infinite loop
-                        e.target.style.display = 'none'; // Hide broken images in mobile
-                      }}
-                    />
-                  </div>
-                )}
+                {hasMedia(event) && renderMedia(event)}
                 
                 <div className="timeline-content">
                   <p>{event.description}</p>

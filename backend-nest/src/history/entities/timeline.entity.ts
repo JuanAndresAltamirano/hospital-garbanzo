@@ -17,6 +17,9 @@ export class Timeline {
   @Column({ nullable: true })
   image: string;
 
+  @Column({ nullable: true })
+  videoUrl: string;
+
   @Column({ default: 0 })
   displayOrder: number;
 

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength, IsUrl } from 'class-validator';
 
 export class UpdateTimelineDto {
   @IsOptional()
@@ -22,4 +22,9 @@ export class UpdateTimelineDto {
   @IsOptional()
   @IsString()
   image?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUrl({}, { message: 'Video URL must be a valid URL' })
+  videoUrl?: string;
 } 

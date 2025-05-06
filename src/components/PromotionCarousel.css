@@ -171,6 +171,7 @@ margin:2.5rem auto
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 }
 
 .promotion-card-content::before {
@@ -234,6 +235,9 @@ margin:2.5rem auto
 }
 
 .discount-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
   display: inline-flex;
   align-items: center;
   background: #f85a5a;
@@ -241,8 +245,9 @@ margin:2.5rem auto
   font-weight: 600;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
-  margin: 0.25rem 0 0.75rem;
   font-size: 1rem;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .price-badge {
@@ -522,7 +527,6 @@ margin:2.5rem auto
   max-height: 63vh;
   object-fit: cover;
   transition: transform 0.5s ease;
-  max-height: 300px;
 }
 
 .promotion-card-inner:hover .promotion-image img {

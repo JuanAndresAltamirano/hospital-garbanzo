@@ -140,7 +140,7 @@ const PromotionCarousel = ({ promotions }) => {
   // Manage autoplay with useRef to avoid dependencies
   useEffect(() => {
     autoPlayRef.current = () => {
-      if (!isAnimating) {
+      if (!isAnimating && promotions.length > 1) {
         setCurrentIndex((prevIndex) => 
           prevIndex === promotions.length - 1 ? 0 : prevIndex + 1
         );
@@ -150,6 +150,9 @@ const PromotionCarousel = ({ promotions }) => {
 
   // Setup interval for autoplay
   useEffect(() => {
+    // Skip autoplay if there's only one promotion
+    if (promotions.length <= 1) return;
+    
     const play = () => {
       autoPlayRef.current();
     };
@@ -159,10 +162,13 @@ const PromotionCarousel = ({ promotions }) => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [promotions.length]);
 
   // Handle keyboard navigation
   useEffect(() => {
+    // Skip keyboard navigation if there's only one promotion
+    if (promotions.length <= 1) return;
+    
     const handleKeyDown = (e) => {
       if (document.activeElement === carouselRef.current || carouselRef.current.contains(document.activeElement)) {
         if (e.key === 'ArrowLeft') {
@@ -177,7 +183,7 @@ const PromotionCarousel = ({ promotions }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [goToNext, goToPrevious]);
+  }, [goToNext, goToPrevious, promotions.length]);
   
   const handleMoreInfoClick = (e, promotionId) => {
     e.stopPropagation(); // Prevent event bubbling
@@ -224,10 +230,6 @@ const PromotionCarousel = ({ promotions }) => {
                         <span>Promoción Especial</span>
                       </div>
                       
-                      <div className="promotion-header">
-                        <h3>{promotion.title}</h3>
-                      </div>
-                      
                       {(promotion.discount > 0 || promotion.promotionalPrice > 0) && (
                         <div className={`discount-badge ${promotion.promotionalPrice > 0 ? 'price-badge' : ''}`}>
                           {promotion.discount > 0 ? (
@@ -243,6 +245,10 @@ const PromotionCarousel = ({ promotions }) => {
                           ) : null}
                         </div>
                       )}
+                      
+                      <div className="promotion-header">
+                        <h3>{promotion.title}</h3>
+                      </div>
                       
                       <div className="promotion-description">
                         {formatDescription(promotion.description)}
@@ -306,37 +312,43 @@ const PromotionCarousel = ({ promotions }) => {
           </div>
         </div>
 
-        <button 
-          className="carousel-button prev" 
-          onClick={goToPrevious} 
-          aria-label="Promoción anterior" 
-          disabled={isAnimating}
-        >
-          <FaChevronLeft aria-hidden="true" />
-        </button>
-        <button 
-          className="carousel-button next" 
-          onClick={goToNext} 
-          aria-label="Promoción siguiente" 
-          disabled={isAnimating}
-        >
-          <FaChevronRight aria-hidden="true" />
-        </button>
-        
-        <div className="carousel-dots" role="tablist" aria-label="Puntos de navegación">
-          {promotions.map((_, index) => (
-            <button
-              key={index}
-              className={`dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Ir a promoción ${index + 1}`}
-              role="tab"
-              aria-selected={index === currentIndex}
+        {promotions.length > 1 && (
+          <>
+            <button 
+              className="carousel-button prev" 
+              onClick={goToPrevious} 
+              aria-label="Promoción anterior" 
               disabled={isAnimating}
-              tabIndex={index === currentIndex ? 0 : -1}
-            />
-          ))}
-        </div>
+            >
+              <FaChevronLeft aria-hidden="true" />
+            </button>
+            <button 
+              className="carousel-button next" 
+              onClick={goToNext} 
+              aria-label="Promoción siguiente" 
+              disabled={isAnimating}
+            >
+              <FaChevronRight aria-hidden="true" />
+            </button>
+          </>
+        )}
+        
+        {promotions.length > 1 && (
+          <div className="carousel-dots" role="tablist" aria-label="Puntos de navegación">
+            {promotions.map((_, index) => (
+              <button
+                key={index}
+                className={`dot ${index === currentIndex ? 'active' : ''}`}
+                onClick={() => goToSlide(index)}
+                aria-label={`Ir a promoción ${index + 1}`}
+                role="tab"
+                aria-selected={index === currentIndex}
+                disabled={isAnimating}
+                tabIndex={index === currentIndex ? 0 : -1}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

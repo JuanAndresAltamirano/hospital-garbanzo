@@ -151,10 +151,7 @@ const ServiceDetail = () => {
                 <h4>¿Necesito preparación previa?</h4>
                 <p>Cada servicio puede requerir una preparación específica. Al agendar su cita, nuestro personal le proporcionará toda la información necesaria.</p>
               </div>
-              <div className="faq-item">
-                <h4>¿Puedo usar mi seguro médico?</h4>
-                <p>Trabajamos con las principales aseguradoras. Consulte sobre las coberturas específicas para este servicio.</p>
-              </div>
+           
             </div>
           </div>
         </div>

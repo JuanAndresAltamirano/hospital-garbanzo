@@ -200,98 +200,98 @@ const Services = () => {
                 <div className="service-icon">{getIcon('stethoscope')}</div>
                 <h3>Medicina General</h3>
                 <p>Atención médica integral para el diagnóstico y tratamiento de diversas condiciones de salud.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Medicina%20General" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[1] = el}>
                 <div className="service-icon">{getIcon('female')}</div>
                 <h3>Obstetricia</h3>
                 <p>Atención especializada para el cuidado durante el embarazo, parto y postparto.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Obstetricia" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[2] = el}>
                 <div className="service-icon">{getIcon('teeth')}</div>
                 <h3>Odontología</h3>
                 <p>Servicios dentales completos para mantener la salud bucal y prevenir enfermedades.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Odontología" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[3] = el}>
                 <div className="service-icon"><FaTeeth /></div>
                 <h3>Endodoncia</h3>
                 <p>Tratamiento especializado para problemas del interior del diente y tejidos pulpares.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Endodoncia" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[4] = el}>
                 <div className="service-icon"><FaTeeth /></div>
                 <h3>Ortodoncia</h3>
                 <p>Corrección de la posición de los dientes y mejora de la mordida para una sonrisa saludable.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Ortodoncia" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[5] = el}>
                 <div className="service-icon"><FaTeeth /></div>
                 <h3>Diseño de sonrisa</h3>
                 <p>Procedimientos estéticos para mejorar la apariencia de su sonrisa de manera personalizada.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Diseño%20de%20sonrisa" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[6] = el}>
                 <div className="service-icon">{getIcon('baby')}</div>
                 <h3>Pediatría</h3>
                 <p>Atención médica especializada para niños, desde recién nacidos hasta adolescentes.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Pediatría" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[7] = el}>
                 <div className="service-icon">{getIcon('syringe')}</div>
                 <h3>Vacunatorio</h3>
                 <p>Administración de vacunas para la prevención de enfermedades en niños y adultos.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Vacunatorio" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[8] = el}>
                 <div className="service-icon">{getIcon('flask')}</div>
                 <h3>Laboratorio clínico</h3>
                 <p>Análisis de muestras para diagnóstico y seguimiento de diversas condiciones médicas.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Laboratorio%20clínico" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[9] = el}>
                 <div className="service-icon">{getIcon('xray')}</div>
                 <h3>Imagenología</h3>
                 <p>Técnicas de diagnóstico por imagen para evaluar órganos y estructuras internas.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Imagenología" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[10] = el}>
                 <div className="service-icon">{getIcon('wheelchair')}</div>
                 <h3>Rehabilitación física</h3>
                 <p>Terapias para recuperar la función y movimiento después de lesiones o cirugías.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Rehabilitación%20física" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[11] = el}>
                 <div className="service-icon">{getIcon('pills')}</div>
                 <h3>Farmacia</h3>
                 <p>Dispensación de medicamentos con asesoramiento profesional para su tratamiento.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20información%20sobre%20Farmacia" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[12] = el}>
                 <div className="service-icon">{getIcon('bandaid')}</div>
                 <h3>Traumatología</h3>
                 <p>Diagnóstico y tratamiento de lesiones y enfermedades del sistema musculoesquelético.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita%20para%20Traumatología" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
               
               <div className="service-card" ref={el => serviceCardsRef.current[13] = el}>
                 <div className="service-icon">{getIcon('notes')}</div>
                 <h3>Sala de procedimientos</h3>
                 <p>Área especializada para realizar procedimientos médicos menores con todas las medidas de seguridad.</p>
-                <a href="/contacto" className="btn btn-primary">Agendar Cita</a>
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20información%20sobre%20Sala%20de%20procedimientos" className="btn btn-primary" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
               </div>
             </div>
           </div>

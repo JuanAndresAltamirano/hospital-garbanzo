@@ -174,7 +174,7 @@ const History = () => {
               Nuestro equipo de profesionales médicos, enfermeros y personal administrativo trabaja incansablemente
               para proporcionar la mejor atención posible, manteniéndonos fieles a nuestra misión de mejorar la calidad de vida de nuestros pacientes.
             </p>
-            <a href="/contacto" className="btn btn-primary commitment-cta">Contáctanos</a>
+            <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20contactarles" className="btn btn-primary commitment-cta" target="_blank" rel="noopener noreferrer">Contáctanos</a>
           </div>
         </div>
       </div>

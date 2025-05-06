@@ -20,11 +20,32 @@
 .logo-container {
   display: flex;
   align-items: center;
+  text-decoration: none;
 }
 
 .logo {
-  height: 50px;
+  height: 60px;
   width: auto;
+  margin-right: 12px;
+}
+
+.center-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.center-title {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.doctor-name {
+  color: #0056b3;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .nav-links {
@@ -75,7 +96,15 @@
   }
 
   .logo {
-    height: 40px;
-    margin-bottom: 1rem;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .center-title {
+    font-size: 12px;
+  }
+  
+  .doctor-name {
+    font-size: 14px;
   }
 } 

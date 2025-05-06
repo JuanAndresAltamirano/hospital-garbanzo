@@ -166,8 +166,8 @@ const ServiceDetail = () => {
           <h3>¿Necesita más información?</h3>
           <p>Contáctenos directamente y resolveremos todas sus dudas sobre nuestros servicios de fisioterapia y rehabilitación.</p>
           <div className="cta-buttons">
-            <a href="/contacto" className="contact-button">Contactar</a>
-            <a href="tel:+123456789" className="phone-button">Llamar Ahora</a>
+            <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="contact-button" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
+            <a href="tel:+593967758178" className="phone-button">Llamar Ahora</a>
           </div>
         </div>
       </div>

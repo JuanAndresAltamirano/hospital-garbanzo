@@ -603,11 +603,12 @@ const Contact = () => {
                 <FaMapMarkerAlt />
               </div>
               <h3>Dirección</h3>
-              <p>Vía Aguarico y Calle Chile</p>
-              <p>Referencia: Frente al Parque Central</p>
-              <a href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" className="contact-link btn btn-primary" target="_blank" rel="noopener noreferrer">
-                Ver en Google Maps <FaChevronRight />
-              </a>
+              <p>Avenida aguarico y Calle Chile, parte posterior de la Federacion Deportiva de Sucumbios</p>
+              <div className="contact-link-container">
+                <a href="https://maps.app.goo.gl/T3JGMtkksu26LVPx9" className="contact-link btn btn-primary" target="_blank" rel="noopener noreferrer">
+                  Ver en Google Maps <FaChevronRight />
+                </a>
+              </div>
             </div>
             
             <div className="contact-info-card">
@@ -615,11 +616,12 @@ const Contact = () => {
                 <FaPhone />
               </div>
               <h3>Teléfonos</h3>
-              <p>+593 99 123 4567</p>
-              <p>+593 2 345 6789</p>
-              <a href="tel:+593991234567" className="contact-link btn btn-primary">
-                Llamar ahora <FaChevronRight />
-              </a>
+              <p>+593967758178</p>
+              <div className="contact-link-container">
+                <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="contact-link btn btn-primary" target="_blank" rel="noopener noreferrer">
+                  Contactenos <FaChevronRight />
+                </a>
+              </div>
             </div>
             
             <div className="contact-info-card">
@@ -627,10 +629,12 @@ const Contact = () => {
                 <FaEnvelope />
               </div>
               <h3>Correo Electrónico</h3>
-              <p>citas@hospitalmullo.com</p>
-              <a href="mailto:maryelenaobando79@yahoo.es" className="contact-link btn btn-primary">
-                Enviar email <FaChevronRight />
-              </a>
+              <p>centromedico-mvm@hotmail.com</p>
+              <div className="contact-link-container">
+                <a href="mailto:centromedico-mvm@hotmail.com" className="contact-link btn btn-primary">
+                  Enviar email <FaChevronRight />
+                </a>
+              </div>
             </div>
             
             <div className="contact-info-card">
@@ -642,10 +646,6 @@ const Contact = () => {
                 <a href="https://www.instagram.com/centrodeespecialidadesmvm_/" className="social-link" target="_blank" rel="noopener noreferrer">
                   <FaInstagram />
                   <span>Instagram</span>
-                </a>
-                <a href="https://www.facebook.com/profile.php?id=100010625824060" className="social-link" target="_blank" rel="noopener noreferrer">
-                  <FaFacebook />
-                  <span>Facebook</span>
                 </a>
               </div>
             </div>
@@ -686,30 +686,30 @@ const Contact = () => {
       <section className={`map-section ${isIntersecting.map ? 'animate-in' : ''}`}>
         <div className="container">
           <h2 className="section-title">Nuestra Ubicación</h2>
-          <p className="section-subtitle">Visítenos en nuestras instalaciones ubicadas en Vía Aguarico y Calle Chile</p>
+          <p className="section-subtitle">Visítenos en nuestras instalaciones ubicadas en Avenida aguarico y calle chile, parte posterior de la Federacion Deportiva de Sucumbios</p>
           
           <div className="map-container">
             <div className="map-card">
               <div className="map-wrapper">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.2493962055687!2d-76.8971807!3d0.0810827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e2823dd9358d955%3A0xdea910ce43daba02!2sCentro%20de%20Especialidades%20M%C3%A9dicas%20Dr.%20Marco%20Vinicio%20Mullo!5e0!3m2!1sen!2sec!4v1719187426972!5m2!1sen!2sec"
+                  src="https://www.google.com/maps/embed?pb=!4v1746533197180!6m8!1m7!1sUxG7IQr5yckHz7tB31E_Dg!2m2!1d0.08125806037478567!2d-76.89724216747506!3f56.891211197258144!4f6.852862267318045!5f0.7820865974627469"
                   width="100%"
                   height="450"
                   style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Ubicación del Centro de Especialidades Médicas Dr. Marco Vinicio Mullo"
+                  title="Vista Street View - Centro de Especialidades Médicas Dr. Marco Vinicio Mullo"
                 ></iframe>
               </div>
               <div className="map-info">
                 <div className="map-address">
                   <h3>Centro de Especialidades Médicas Dr. Marco V. Mullo</h3>
-                  <p><FaMapMarkerAlt /> Vía Aguarico y Calle Chile</p>
+                  <p><FaMapMarkerAlt /> Avenida aguarico y calle chile, parte posterior de la Federacion Deportiva de Sucumbios</p>
                   <p>Lago Agrio, Ecuador</p>
                   <div className="map-actions">
                     <a 
-                      href="https://maps.app.goo.gl/A5D7nQCh7NDV9yUZA" 
+                      href="https://maps.app.goo.gl/T3JGMtkksu26LVPx9" 
                       className="action-btn btn btn-primary" 
                       target="_blank" 
                       rel="noopener noreferrer"

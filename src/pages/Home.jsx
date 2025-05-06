@@ -152,7 +152,7 @@ const Home = () => {
           <p className="hero-subtitle">Cuidamos de ti y tu familia con excelencia y calidez</p>
           <div className="hero-buttons">
             <a href="/servicios" className="btn btn-primary">Nuestros Servicios</a>
-            <a href="/contacto" className="btn btn-outline">Agendar Cita</a>
+            <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="btn btn-outline" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ const Home = () => {
             <a href="/servicios" className="btn btn-primary">
               Nuestros Servicios <FaChevronRight />
             </a>
-            <a href="/contacto" className="btn btn-primary btn-llamar">
+            <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="btn btn-primary btn-llamar" target="_blank" rel="noopener noreferrer">
               <FaCalendarCheck /> Agendar Cita
             </a>
           </div>
@@ -278,10 +278,10 @@ const Home = () => {
             <h2 className="animated-element">¿Necesita Atención Médica Profesional?</h2>
             <p className="animated-element">Estamos aquí para brindarle la mejor atención. Contáctenos hoy mismo para agendar su cita.</p>
             <div className="cta-buttons animated-element">
-              <a href="tel:+123456789" className="btn btn-primary btn-llamar">
+              <a href="tel:+593967758178" className="btn btn-primary btn-llamar">
                 <FaPhone /> Llamar Ahora
               </a>
-              <a href="/contacto" className="btn btn-primary">
+              <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="btn btn-primary" target="_blank" rel="noopener noreferrer">
                 <FaCalendarCheck /> Agendar Cita
               </a>
             </div>

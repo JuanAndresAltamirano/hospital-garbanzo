@@ -19,7 +19,7 @@ export class GalleryService {
 
   async findAllCategories() {
     const categories = await this.categoriesRepository.find({
-      relations: ['images', 'subcategories', 'parent'],
+      relations: ['images', 'subcategories', 'subcategories.images', 'parent'],
       order: {
         order: 'ASC',
         subcategories: {
@@ -43,7 +43,7 @@ export class GalleryService {
   async findCategoryById(id: number) {
     const category = await this.categoriesRepository.findOne({
       where: { id },
-      relations: ['images', 'subcategories', 'parent'],
+      relations: ['images', 'subcategories', 'subcategories.images', 'parent'],
       order: {
         subcategories: {
           order: 'ASC',

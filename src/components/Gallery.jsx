@@ -97,7 +97,7 @@ const CategorizedGallery = ({ title, subtitle, onImageClick }) => {
               key={category.id} 
               className={`gallery-category-content ${activeCategory === category.id ? 'active' : ''}`}
             >
-              <p className="gallery-category-description">{category.description}</p>
+              <p className="gallery-category-description">{category.title}</p>
               
               <div className="gallery-grid">
                 {category.images.map((image, imageIndex) => {
@@ -134,7 +134,7 @@ const CategorizedGallery = ({ title, subtitle, onImageClick }) => {
                           </div>
                         )}
                       </div>
-                      {image.caption && <div className="gallery-caption">{image.caption}</div>}
+                      {image.caption && <div className="gallery-caption">{image.title}</div>}
                     </div>
                   );
                 })}

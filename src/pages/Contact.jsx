@@ -200,92 +200,38 @@ const fallbackGallery = {
 // Categorized Gallery component
 const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
   const [activeCategory, setActiveCategory] = useState(null);
-  const [activeSubcategory, setActiveSubcategory] = useState(null);
-  const [subcategoryImages, setSubcategoryImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   
   // Set first category as active by default
   useEffect(() => {
     if (categories && categories.length > 0 && !activeCategory) {
       setActiveCategory(categories[0].id);
-      
-      // If the category has subcategories, set the first one as active
-      const firstCategory = categories[0];
-      if (firstCategory.subcategories && firstCategory.subcategories.length > 0) {
-        setActiveSubcategory(firstCategory.subcategories[0].id);
-      } else {
-        setActiveSubcategory(null);
-      }
     }
   }, [categories]);
   
-  // When changing category, reset subcategory
-  useEffect(() => {
-    if (activeCategory) {
-      const category = categories.find(cat => cat.id === activeCategory);
-      if (category && category.subcategories && category.subcategories.length > 0) {
-        setActiveSubcategory(category.subcategories[0].id);
-      } else {
-        setActiveSubcategory(null);
-        setSubcategoryImages([]);
-      }
-    }
-  }, [activeCategory, categories]);
-  
-  // Fetch images when subcategory changes
-  useEffect(() => {
-    if (activeCategory && activeSubcategory) {
-      const loadSubcategoryImages = async () => {
-        setLoadingImages(true);
-        try {
-          const images = await galleryService.getSubcategoryImages(activeCategory, activeSubcategory);
-          setSubcategoryImages(images);
-        } catch (error) {
-          console.error("Error loading subcategory images:", error);
-          // Fallback to subcategory images from the categories data
-          const category = categories.find(cat => cat.id === activeCategory);
-          const subcategory = category?.subcategories?.find(sub => sub.id === activeSubcategory);
-          setSubcategoryImages(subcategory?.images || []);
-        } finally {
-          setLoadingImages(false);
-        }
-      };
-      
-      loadSubcategoryImages();
-    } else {
-      setSubcategoryImages([]);
-    }
-  }, [activeCategory, activeSubcategory, categories]);
-  
   if (!categories || categories.length === 0) return null;
   
-  // Get current category object
-  const currentCategory = categories.find(cat => cat.id === activeCategory);
+  // Get current category object - safe check that it exists
+  const currentCategory = categories.find(cat => cat.id === activeCategory) || categories[0];
+  
+  // Safety check before accessing properties
+  if (!currentCategory) {
+    return (
+      <section className="gallery-section animate-in">
+        <div className="container">
+          {title && <h2 className="section-title">{title}</h2>}
+          {subtitle && <p className="section-subtitle">{subtitle}</p>}
+          <div className="no-images-message">
+            <p>No hay categorías disponibles</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
   
   // Check if current category has subcategories
-  const hasSubcategories = currentCategory && 
-                          currentCategory.subcategories && 
+  const hasSubcategories = currentCategory.subcategories && 
                           currentCategory.subcategories.length > 0;
-  
-  // Get images to display based on whether we're showing subcategories or not
-  const getImagesToDisplay = () => {
-    if (!currentCategory) return [];
-    
-    if (hasSubcategories && activeSubcategory) {
-      // If we have loaded images from the API, use those
-      if (subcategoryImages.length > 0) {
-        return subcategoryImages;
-      }
-      
-      // Otherwise fall back to the subcategory images from the initial data
-      const subcategory = currentCategory.subcategories.find(
-        sub => sub.id === activeSubcategory
-      );
-      return subcategory ? subcategory.images : [];
-    }
-    
-    return currentCategory.images || [];
-  };
   
   return (
     <section className="gallery-section animate-in">
@@ -305,30 +251,9 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
           ))}
         </div>
         
-        {/* Show subcategories if available */}
-        {hasSubcategories && (
-          <div className="gallery-subcategories">
-            {currentCategory.subcategories.map(subcategory => (
-              <button 
-                key={subcategory.id}
-                className={`gallery-subcategory-btn ${activeSubcategory === subcategory.id ? 'active' : ''}`}
-                onClick={() => setActiveSubcategory(subcategory.id)}
-              >
-                {subcategory.name}
-              </button>
-            ))}
-          </div>
-        )}
-        
         {/* Display current category description */}
         <div className="gallery-category-content active">
-          {hasSubcategories && activeSubcategory ? (
-            <p className="gallery-category-description">
-              {currentCategory.subcategories.find(sub => sub.id === activeSubcategory)?.description || ''}
-            </p>
-          ) : (
-            <p className="gallery-category-description">{currentCategory?.description || ''}</p>
-          )}
+          <p className="gallery-category-description">{currentCategory?.description || ''}</p>
           
           {loadingImages ? (
             <div className="loading-gallery">
@@ -336,50 +261,39 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
             </div>
           ) : (
             <div className="gallery-grid">
-              {getImagesToDisplay().length === 0 ? (
-                <div className="no-images-message">
-                  <p>No hay imágenes disponibles para esta categoría</p>
-                </div>
-              ) : (
-                getImagesToDisplay().map((image, imageIndex) => {
-                  // Group images by item (assuming images for the same item have consecutive indices)
-                  const hasMultipleImages = getImagesToDisplay().length > 1;
-                  
-                  return (
-                    <div 
-                      className="gallery-item" 
-                      key={imageIndex} 
-                      onClick={() => onImageClick(
-                        activeCategory, 
-                        imageIndex,
-                        activeSubcategory // Pass subcategory ID if applicable
-                      )}
-                    >
-                      <div className={`gallery-image-container ${hasMultipleImages ? 'has-multiple' : ''}`}>
-                        <img 
-                          src={image.src} 
-                          alt={image.alt || 'Imagen de galería'} 
-                          loading="lazy"
-                          onError={(e) => {
-                            console.error('Image failed to load:', image.src);
-                            e.target.onerror = null; // Prevent infinite callback loop
-                            e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
-                          }}
-                        />
-                        {hasMultipleImages && (
-                          <div className="gallery-corner-indicator">
-                            <FaImages /> {getImagesToDisplay().length}
-                          </div>
-                        )}
-                        <div className="gallery-overlay">
-                          <FaImage />
-                          <span>Ver imagen</span>
-                        </div>
+              {currentCategory?.subcategories && currentCategory.subcategories.length > 0 ? (
+                currentCategory.subcategories.map((subcategory, index) => (
+                  <div 
+                    className="gallery-item" 
+                    key={index}
+                    onClick={() => onImageClick(currentCategory.id, 0, subcategory.id)}
+                  >
+                    <div className="gallery-image-container">
+                      <img 
+                        src={subcategory.images && subcategory.images.length > 0 
+                          ? subcategory.images[0].src 
+                          : 'https://via.placeholder.com/300x250?text=No+Image'}
+                        alt={subcategory.name || 'Imagen de galería'} 
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          console.error('Image failed to load:', e.target.src);
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
+                        }}
+                      />
+                      <div className="gallery-overlay">
+                        <FaImage />
+                        <span>{subcategory.description || subcategory.name}</span>
                       </div>
-                      {image.caption && <div className="gallery-caption">{image.caption}</div>}
                     </div>
-                  );
-                })
+                    <div className="gallery-caption">{ subcategory.name}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-images-message">
+                  <p>No hay subcategorías disponibles para esta categoría</p>
+                </div>
               )}
             </div>
           )}
@@ -474,7 +388,7 @@ const GalleryModal = ({ isOpen, categories, subcategoryImages, currentCategory, 
         
         <div className="gallery-info-area">
           <h2 className="gallery-title">{currentImage.alt || 'Imagen'}</h2>
-          <p className="gallery-description">{currentImage.caption || ''}</p>
+          <p className="gallery-description">{currentImage.title || ''}</p>
           <div className="gallery-counter">{currentIndex + 1} / {images.length}</div>
         </div>
       </div>
@@ -588,14 +502,14 @@ const Contact = () => {
 
   const openGallery = async (categoryId, imageIndex, subcategoryId = null) => {
     setCurrentCategory(categoryId);
-    setCurrentSubcategory(subcategoryId);
     setCurrentImage(imageIndex);
     
-    // If a subcategory is selected, fetch its images
+    // If a subcategory is selected, set it and fetch its images
     if (subcategoryId) {
+      setCurrentSubcategory(subcategoryId);
       try {
         const images = await galleryService.getSubcategoryImages(categoryId, subcategoryId);
-        setSubcategoryImages(images);
+        setSubcategoryImages(images.length > 0 ? images : []);
       } catch (error) {
         console.error("Error loading subcategory images for gallery:", error);
         // Fallback to subcategory images from the categories data
@@ -604,6 +518,7 @@ const Contact = () => {
         setSubcategoryImages(subcategory?.images || []);
       }
     } else {
+      setCurrentSubcategory(null);
       setSubcategoryImages([]);
     }
     

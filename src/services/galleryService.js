@@ -200,6 +200,7 @@ export const galleryService = {
         }
       };
       
+      console.log('Formatted gallery data for contact:', formattedGallery);
       return formattedGallery;
     } catch (error) {
       console.error('Error fetching gallery data for contact:', error);

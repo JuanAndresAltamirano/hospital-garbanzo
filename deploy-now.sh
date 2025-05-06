@@ -20,16 +20,31 @@ chmod +x deploy-clinicamullo.sh
 echo "Cleaning up any existing containers..."
 docker-compose -f docker-compose.prod.yml down || true
 
-# Remove any conflicting containers
+# Force remove any conflicting containers specifically
+echo "Force removing specific containers if they exist..."
 if docker ps -a --format '{{.Names}}' | grep -q "clinica_mullo_db"; then
     echo "Removing existing database container..."
     docker rm -f clinica_mullo_db
+fi
+
+if docker ps -a --format '{{.Names}}' | grep -q "clinica_mullo_frontend"; then
+    echo "Removing existing frontend container..."
+    docker rm -f clinica_mullo_frontend
+fi
+
+if docker ps -a --format '{{.Names}}' | grep -q "hospital-garbanzo_frontend"; then
+    echo "Removing existing frontend container (old name)..."
+    docker rm -f hospital-garbanzo_frontend_1
 fi
 
 if docker ps -a --format '{{.Names}}' | grep -q "nginx"; then
     echo "Removing existing nginx container..."
     docker rm -f nginx
 fi
+
+# Clean Docker system to avoid any caching issues
+echo "Cleaning Docker system..."
+docker system prune -f
 
 # Fix permissions on certbot directories
 echo "Setting up proper permissions..."

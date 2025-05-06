@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: clinica_mullo_frontend
     build:
       context: .
       dockerfile: Dockerfile.frontend.prod

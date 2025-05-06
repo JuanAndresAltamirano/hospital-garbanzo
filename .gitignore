@@ -13,6 +13,7 @@
 *.sublime-project
 *.sublime-workspace
 
+# Exclude image files except those in src/assets
 *.jpg
 *.png
 *.jpeg
@@ -20,6 +21,15 @@
 *.svg
 *.webp
 *.ico
+
+# But allow images in assets directory
+!src/assets/**/*.jpg
+!src/assets/**/*.png
+!src/assets/**/*.jpeg
+!src/assets/**/*.gif
+!src/assets/**/*.svg
+!src/assets/**/*.webp
+!src/assets/**/*.ico
 
 # Logs
 npm-debug.log*

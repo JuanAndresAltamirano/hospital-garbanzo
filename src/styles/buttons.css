@@ -1,0 +1,288 @@
+/* 
+   Global Button Styles
+   This file standardizes all button styles across the application
+*/
+
+/* Base Button Styles */
+.btn,
+button.btn,
+a.btn,
+input[type="button"],
+input[type="submit"],
+.promotion-button,
+.action-button,
+.learn-more-btn,
+.contact-link-btn,
+.service-btn,
+.gallery-btn,
+button.gallery-category-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+  color: white;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(95, 158, 160, 0.25);
+}
+
+/* Button Hover and Active States */
+.btn:hover,
+button.btn:hover,
+a.btn:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+.promotion-button:hover,
+.action-button:hover,
+.learn-more-btn:hover,
+.contact-link-btn:hover,
+.service-btn:hover,
+.gallery-btn:hover,
+button.gallery-category-btn:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(95, 158, 160, 0.35);
+}
+
+.btn:active,
+button.btn:active,
+a.btn:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+.promotion-button:active,
+.action-button:active,
+.learn-more-btn:active,
+.contact-link-btn:active,
+.service-btn:active,
+.gallery-btn:active,
+button.gallery-category-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(95, 158, 160, 0.3);
+}
+
+/* Button Focus States */
+.btn:focus,
+button.btn:focus,
+a.btn:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus,
+.promotion-button:focus,
+.action-button:focus,
+.learn-more-btn:focus,
+.contact-link-btn:focus,
+.service-btn:focus,
+.gallery-btn:focus,
+button.gallery-category-btn:focus {
+  outline: 2px solid rgba(95, 158, 160, 0.5);
+  outline-offset: 2px;
+}
+
+/* Button with Icon */
+.btn svg,
+.btn i,
+button.btn svg,
+button.btn i,
+a.btn svg,
+a.btn i,
+.promotion-button svg,
+.promotion-button i,
+.contact-link-btn svg,
+.contact-link-btn i,
+.service-btn svg,
+.service-btn i {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.btn:hover svg,
+.btn:hover i,
+button.btn:hover svg,
+button.btn:hover i,
+a.btn:hover svg,
+a.btn:hover i,
+.promotion-button:hover svg,
+.promotion-button:hover i,
+.contact-link-btn:hover svg,
+.contact-link-btn:hover i,
+.service-btn:hover svg,
+.service-btn:hover i {
+  transform: translateX(3px);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 1.125rem;
+}
+
+/* Button Shapes */
+.btn-rounded {
+  border-radius: 50px;
+}
+
+.btn-square {
+  border-radius: 4px;
+}
+
+/* Button Variants */
+.btn-primary, 
+.contact-link-btn.btn-primary {
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+  color: white;
+}
+
+.btn-primary:hover,
+.contact-link-btn.btn-primary:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #5f9ea0;
+  color: #5f9ea0;
+}
+
+.btn-outline:hover {
+  background: rgba(95, 158, 160, 0.1);
+  color: #4a7b7d;
+}
+
+/* Service Section Buttons */
+.service-btn, 
+.promotion-button,
+.btn-service {
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+  color: white;
+  box-shadow: 0 4px 12px rgba(95, 158, 160, 0.25);
+}
+
+.service-btn:hover,
+.promotion-button:hover,
+.btn-service:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+}
+
+/* Contact Section Buttons */
+.contact-btn, 
+.contact-link-btn {
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+  color: white;
+}
+
+.contact-btn:hover,
+.contact-link-btn:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+}
+
+/* Gallery Category Buttons */
+.gallery-category-btn,
+.btn-gallery {
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+  border-radius: 4px;
+  color: white;
+  margin: 0 5px;
+  padding: 10px 20px;
+}
+
+.gallery-category-btn:hover,
+.btn-gallery:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+}
+
+.gallery-category-btn.active,
+.btn-gallery.active {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(95, 158, 160, 0.4);
+}
+
+/* Disabled Button States */
+.btn:disabled,
+button.btn:disabled,
+a.btn:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+.promotion-button:disabled,
+.action-button:disabled,
+.learn-more-btn:disabled,
+.contact-link-btn:disabled,
+.service-btn:disabled,
+.gallery-btn:disabled,
+button.gallery-category-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #96b5b6, #84a5a6);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Specific adjustments for the promotion carousel */
+.promotion-button-wrapper .promotion-button {
+  margin-top: 15px;
+}
+
+/* Specific adjustments for red accent buttons shown in screenshots */
+.accent-btn {
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+}
+
+.accent-btn:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
+}
+
+/* Media queries for responsive buttons */
+@media (max-width: 768px) {
+  .btn,
+  button.btn,
+  a.btn,
+  input[type="button"],
+  input[type="submit"],
+  .promotion-button,
+  .action-button,
+  .learn-more-btn,
+  .contact-link-btn,
+  .service-btn,
+  .gallery-btn {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
+  
+  .btn-lg {
+    padding: 12px 24px;
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn,
+  button.btn,
+  a.btn,
+  input[type="button"],
+  input[type="submit"],
+  .promotion-button,
+  .action-button,
+  .learn-more-btn,
+  .contact-link-btn,
+  .service-btn,
+  .gallery-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+} 

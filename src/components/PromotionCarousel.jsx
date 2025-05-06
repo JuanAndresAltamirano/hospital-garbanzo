@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { FaChevronLeft, FaChevronRight, FaCalendarAlt, FaPercentage, FaArrowRight, 
          FaClock, FaTag, FaHospital } from 'react-icons/fa';
@@ -78,41 +78,106 @@ const isDefaultDate = (dateString, promotion) => {
 const PromotionCarousel = ({ promotions }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const autoPlayRef = useRef(null);
+  const carouselRef = useRef(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === promotions.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 7000); // Change slide every 7 seconds
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+  
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrevious();
+    }
+    
+    // Reset values
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
-    return () => clearInterval(timer);
-  }, [promotions.length]);
-
-  const goToSlide = (index) => {
+  const goToSlide = useCallback((index) => {
     if (isAnimating) return;
     setIsAnimating(true);
     setCurrentIndex(index);
     setTimeout(() => setIsAnimating(false), 500); // Match transition duration
-  };
+  }, [isAnimating]);
 
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     if (isAnimating) return;
     setIsAnimating(true);
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? promotions.length - 1 : prevIndex - 1
     );
     setTimeout(() => setIsAnimating(false), 500);
-  };
+  }, [isAnimating, promotions.length]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     if (isAnimating) return;
     setIsAnimating(true);
     setCurrentIndex((prevIndex) => 
       prevIndex === promotions.length - 1 ? 0 : prevIndex + 1
     );
     setTimeout(() => setIsAnimating(false), 500);
-  };
+  }, [isAnimating, promotions.length]);
+  
+  // Manage autoplay with useRef to avoid dependencies
+  useEffect(() => {
+    autoPlayRef.current = () => {
+      if (!isAnimating) {
+        setCurrentIndex((prevIndex) => 
+          prevIndex === promotions.length - 1 ? 0 : prevIndex + 1
+        );
+      }
+    };
+  }, [isAnimating, promotions.length]);
+
+  // Setup interval for autoplay
+  useEffect(() => {
+    const play = () => {
+      autoPlayRef.current();
+    };
+    
+    const interval = setInterval(play, 7000);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (document.activeElement === carouselRef.current || carouselRef.current.contains(document.activeElement)) {
+        if (e.key === 'ArrowLeft') {
+          goToPrevious();
+        } else if (e.key === 'ArrowRight') {
+          goToNext();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [goToNext, goToPrevious]);
   
   const handleMoreInfoClick = (e, promotionId) => {
     e.stopPropagation(); // Prevent event bubbling
@@ -125,9 +190,18 @@ const PromotionCarousel = ({ promotions }) => {
 
   return (
     <section className="health-promotions-section">
-      <div className="decoration-left"></div>
-      <div className="decoration-right"></div>
-      <div className="promotion-carousel">
+      <div className="decoration-left" aria-hidden="true"></div>
+      <div className="decoration-right" aria-hidden="true"></div>
+      <div 
+        className="promotion-carousel" 
+        ref={carouselRef}
+        tabIndex="0"
+        aria-label="Carrusel de promociones"
+        role="region"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="carousel-container">
           <div 
             className="carousel-track"
@@ -137,11 +211,16 @@ const PromotionCarousel = ({ promotions }) => {
               const remainingDays = getRemainingDays(promotion.endDate);
               
               return (
-                <div key={promotion.id} className="carousel-slide">
+                <div 
+                  key={promotion.id} 
+                  className="carousel-slide" 
+                  aria-hidden={currentIndex !== index}
+                  aria-roledescription="slide"
+                >
                   <div className="promotion-card-inner">
                     <div className="promotion-card-content">
                       <div className="promotion-label">
-                        <FaTag />
+                        <FaTag aria-hidden="true" />
                         <span>Promoción Especial</span>
                       </div>
                       
@@ -153,7 +232,7 @@ const PromotionCarousel = ({ promotions }) => {
                         <div className={`discount-badge ${promotion.promotionalPrice > 0 ? 'price-badge' : ''}`}>
                           {promotion.discount > 0 ? (
                             <>
-                              <FaPercentage />
+                              <FaPercentage aria-hidden="true" />
                               <span>¡{Math.round(promotion.discount)}% de descuento!</span>
                             </>
                           ) : promotion.promotionalPrice > 0 ? (
@@ -171,7 +250,7 @@ const PromotionCarousel = ({ promotions }) => {
                       
                       {remainingDays !== null && remainingDays <= 7 && (
                         <div className="expiring-soon">
-                          <FaClock />
+                          <FaClock aria-hidden="true" />
                           <span>¡Termina pronto! Solo {remainingDays} {remainingDays === 1 ? 'día' : 'días'} restantes</span>
                         </div>
                       )}
@@ -180,19 +259,19 @@ const PromotionCarousel = ({ promotions }) => {
                         <div className="promotion-dates">
                           {promotion.startDate && (
                             <div className="date-item">
-                              <FaCalendarAlt />
+                              <FaCalendarAlt aria-hidden="true" />
                               <span>Desde: {formatDate(promotion.startDate)}</span>
                             </div>
                           )}
                           {promotion.endDate && (
                             <div className="date-item">
-                              <FaCalendarAlt />
+                              <FaCalendarAlt aria-hidden="true" />
                               <span>Hasta: {formatDate(promotion.endDate)}</span>
                             </div>
                           )}
                           {promotion.service && (
                             <div className="date-item service-item">
-                              <FaHospital />
+                              <FaHospital aria-hidden="true" />
                               <span>Servicio: {promotion.service}</span>
                             </div>
                           )}
@@ -207,7 +286,7 @@ const PromotionCarousel = ({ promotions }) => {
                           className="promotion-button"
                           onClick={(e) => handleMoreInfoClick(e, promotion.id)}
                         >
-                          Más Información <FaArrowRight />
+                          Más Información <FaArrowRight aria-hidden="true" />
                         </a>
                       </div>
                     </div>
@@ -227,21 +306,34 @@ const PromotionCarousel = ({ promotions }) => {
           </div>
         </div>
 
-        <button className="carousel-button prev" onClick={goToPrevious} aria-label="Promoción anterior" disabled={isAnimating}>
-          <FaChevronLeft />
+        <button 
+          className="carousel-button prev" 
+          onClick={goToPrevious} 
+          aria-label="Promoción anterior" 
+          disabled={isAnimating}
+        >
+          <FaChevronLeft aria-hidden="true" />
         </button>
-        <button className="carousel-button next" onClick={goToNext} aria-label="Promoción siguiente" disabled={isAnimating}>
-          <FaChevronRight />
+        <button 
+          className="carousel-button next" 
+          onClick={goToNext} 
+          aria-label="Promoción siguiente" 
+          disabled={isAnimating}
+        >
+          <FaChevronRight aria-hidden="true" />
         </button>
         
-        <div className="carousel-dots">
+        <div className="carousel-dots" role="tablist" aria-label="Puntos de navegación">
           {promotions.map((_, index) => (
             <button
               key={index}
               className={`dot ${index === currentIndex ? 'active' : ''}`}
               onClick={() => goToSlide(index)}
               aria-label={`Ir a promoción ${index + 1}`}
+              role="tab"
+              aria-selected={index === currentIndex}
               disabled={isAnimating}
+              tabIndex={index === currentIndex ? 0 : -1}
             />
           ))}
         </div>

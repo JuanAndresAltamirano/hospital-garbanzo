@@ -47,18 +47,25 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--primary-blue);
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
   color: white;
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(95, 158, 160, 0.2);
 }
 button:hover {
-  background-color: var(--primary-blue-dark);
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
   transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(95, 158, 160, 0.3);
+}
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(95, 158, 160, 0.25);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid rgba(95, 158, 160, 0.5);
+  outline-offset: 2px;
 }
 
 #root {

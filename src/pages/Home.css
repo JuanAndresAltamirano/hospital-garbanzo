@@ -232,6 +232,11 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
+.hero-buttons .btn:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+}
+
 .hero-buttons .btn::before {
   content: '';
   position: absolute;
@@ -249,7 +254,11 @@
 }
 
 .hero-buttons .btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
+}
+
+.hero-buttons .btn-primary:hover {
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
 }
 
 .hero-buttons .btn-outline {
@@ -325,7 +334,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, rgba(95, 158, 160, 0.95), var(--primary-red));
+  background: linear-gradient(to right, #5f9ea0, #4a7b7d);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s ease;
@@ -356,7 +365,7 @@
 }
 
 .highlight-card:hover .highlight-icon {
-  background: linear-gradient(135deg, rgba(95, 158, 160, 0.95) 0%, var(--primary-red) 100%);
+  background: linear-gradient(135deg, #5f9ea0 0%, #4a7b7d 100%);
   box-shadow: 0 10px 25px rgba(95, 158, 160, 0.3);
   transform: scale(1.1);
   color: white;
@@ -595,13 +604,14 @@
   overflow: hidden;
 }
 
+/* Update CTA buttons for consistency */
 .cta-buttons .btn-primary {
-  background: linear-gradient(135deg, #e31837, #c53030);
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d);
   border: none;
 }
 
 .cta-buttons .btn-primary:hover {
-  background: linear-gradient(135deg, #c53030, #e31837);
+  background: linear-gradient(135deg, #4a7b7d, #3d6566);
   transform: translateY(-5px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
@@ -621,18 +631,18 @@
 
 /* Pulse animation for primary CTA button */
 .cta-buttons .btn-primary {
-  animation: pulse 2s infinite;
+  animation: subtle-pulse 3s infinite;
 }
 
-@keyframes pulse {
+@keyframes subtle-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(227, 24, 55, 0.4);
+    box-shadow: 0 0 0 0 rgba(95, 158, 160, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 15px rgba(227, 24, 55, 0);
+    box-shadow: 0 0 0 15px rgba(95, 158, 160, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(227, 24, 55, 0);
+    box-shadow: 0 0 0 0 rgba(95, 158, 160, 0);
   }
 }
 
@@ -708,10 +718,11 @@
 
 /* Animation styles */
 .promotions-section {
-  padding: 6rem 0;
+  padding-top: 4rem;
   background-color: var(--background-light);
   position: relative;
   overflow: hidden;
+  min-height: 70vh;
 }
 
 /* Keep the base animation settings from our global animation styles */
@@ -720,6 +731,8 @@
   position: relative;
   z-index: 10;
   pointer-events: auto !important;
+  min-height: 70vh;
+
 }
 
 /* Enhanced animation for carousel items */
@@ -777,7 +790,7 @@
 
 /* Specific styling for the Call Now button */
 .btn-llamar {
-  background: linear-gradient(135deg, #ff4d6a, #e31837) !important;
+  background: linear-gradient(135deg, #5f9ea0, #4a7b7d) !important;
   color: white !important;
   font-weight: 700 !important;
   letter-spacing: 0.5px;
@@ -786,7 +799,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50px !important;
-  box-shadow: 0 10px 25px rgba(227, 24, 55, 0.35) !important;
+  box-shadow: 0 10px 25px rgba(95, 158, 160, 0.35) !important;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   position: relative;
   z-index: 10;
@@ -797,7 +810,13 @@
 
 .btn-llamar:hover {
   transform: translateY(-5px) scale(1.03) !important;
-  box-shadow: 0 15px 30px rgba(227, 24, 55, 0.45) !important;
+  box-shadow: 0 15px 30px rgba(95, 158, 160, 0.45) !important;
+  background: linear-gradient(135deg, #4a7b7d, #3d6566) !important;
+}
+
+.btn-llamar:active {
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 10px 20px rgba(95, 158, 160, 0.4) !important;
 }
 
 .btn-llamar::before {
@@ -820,10 +839,10 @@
 .btn-llamar i {
   margin-right: 8px;
   font-size: 1.2rem;
-  animation: pulse-icon 1.5s infinite;
+  animation: subtle-icon-pulse 2s infinite;
 }
 
-@keyframes pulse-icon {
+@keyframes subtle-icon-pulse {
   0% {
     transform: scale(1);
   }

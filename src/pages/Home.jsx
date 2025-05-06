@@ -158,7 +158,6 @@ const Home = () => {
       </div>
 
       <div className="promotions-section" id="promotions">
-        <div className="container">
           <h2 className="section-title animated-element">Promociones Especiales</h2>
           {loading ? (
             <div className="loading-banner animated-element">
@@ -167,16 +166,14 @@ const Home = () => {
             </div>
           ) : (
             promotions.length > 0 ? (
-              <div className="carousel-container animated-element" style={{ pointerEvents: 'auto' }}>
                 <PromotionCarousel promotions={promotions} />
-              </div>
             ) : (
               <div className="no-promotions-banner animated-element">
                 <p>No hay promociones disponibles en este momento.</p>
               </div>
             )
           )}
-        </div>
+      
       </div>
 
       <section className="hero">

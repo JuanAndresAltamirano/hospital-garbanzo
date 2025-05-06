@@ -14,6 +14,7 @@ import Admin from './pages/Admin';
 import PasswordRecovery from './pages/PasswordRecovery';
 import PasswordReset from './pages/PasswordReset';
 import './styles/globals.css';
+import './styles/buttons.css';
 
 // Redirect component for services
 function ServiceRedirect() {

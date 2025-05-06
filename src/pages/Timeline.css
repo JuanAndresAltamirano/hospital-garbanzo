@@ -142,6 +142,19 @@
   line-height: 1.4;
 }
 
+.timeline-year-mobile {
+  display: none; /* Ensure it's completely hidden in web view */
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  background-color: cadetblue;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  margin-left: 1.5rem;
+  box-shadow: 0 4px 10px rgba(95, 158, 160, 0.3);
+}
+
 .timeline-media {
   width: 100%;
   position: relative;
@@ -334,6 +347,11 @@
     margin-bottom: 0;
     font-size: 0.85rem;
     padding: 0.3rem 0.8rem;
+    display: none; /* Hide the original date in mobile view */
+  }
+  
+  .timeline-year-mobile {
+    display: inline-block; /* Show the mobile year in responsive view */
   }
   
   .timeline-card:hover .timeline-date {

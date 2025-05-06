@@ -1,81 +1,498 @@
 .header {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.header.scrolled {
+  padding: 0.5rem 0;
 }
 
 .header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.8rem 1.2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+  margin-left: -0.5rem;
 }
 
 .logo {
-  height: 50px;
-  width: auto;
+  height: 3.5rem;
+  transition: all 0.3s ease;
+}
+
+.header.scrolled .logo {
+  height: 3rem;
+}
+
+.header.menu-open .logo-container {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+/* Refined hamburger icon with X transform */
+.hamburger-icon {
+  display: block;
+  width: 26px;
+  height: 22px;
+  position: relative;
+}
+
+.hamburger-icon span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: cadetblue;
+  border-radius: 4px;
+  left: 0;
+  transform: rotate(0deg);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hamburger-icon span:nth-child(1) {
+  top: 2px;
+}
+
+.hamburger-icon span:nth-child(2) {
+  top: 10px;
+  width: 85%;
+  right: 0;
+  left: auto;
+}
+
+.hamburger-icon span:nth-child(3) {
+  top: 18px;
+}
+
+/* Active state transformations for X */
+.active .hamburger-icon span:nth-child(1) {
+  top: 10px;
+  transform: rotate(45deg);
+  width: 100%;
+  left: 0;
+}
+
+.active .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.active .hamburger-icon span:nth-child(3) {
+  top: 10px;
+  transform: rotate(-45deg);
+  width: 100%;
+  left: 0;
+}
+
+/* Button styling with better hover effect */
+.mobile-menu-toggle {
+  cursor: pointer;
+  background: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1060;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-toggle:hover {
+  background-color: rgba(95, 158, 160, 0.08);
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(95, 158, 160, 0.2);
+}
+
+.mobile-menu-toggle.active {
+  background: cadetblue;
+  box-shadow: 0 3px 10px rgba(95, 158, 160, 0.3);
+}
+
+.mobile-menu-toggle.active:hover {
+  transform: scale(1.05);
+}
+
+.mobile-menu-toggle .hamburger-icon {
+  color: cadetblue;
+  font-size: 22px;
+}
+
+.mobile-menu-toggle.active .hamburger-icon {
+  color: white;
+  font-size: 24px;
+}
+
+.mobile-menu-toggle .hamburger-icon span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: cadetblue;
+  border-radius: 4px;
+  left: 0;
+  transform: rotate(0deg);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hamburger-icon span:nth-child(1) {
+  top: 2px;
+}
+
+.hamburger-icon span:nth-child(2) {
+  top: 10px;
+  width: 85%;
+  right: 0;
+  left: auto;
+}
+
+.hamburger-icon span:nth-child(3) {
+  top: 18px;
 }
 
 .nav-links {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  height: 100vh;
+  width: 75%;
+  max-width: 300px;
+  background-color: #fff;
+  z-index: 1050;
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
+  transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid rgba(95, 158, 160, 0.05);
+  overflow-y: auto;
+  padding-top: 1rem;
+}
+
+.nav-links.active {
+  right: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 1.5rem 1rem 0.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #f8f9fa, rgba(95, 158, 160, 0.05));
+  border-bottom: 1px solid rgba(95, 158, 160, 0.08);
+  position: relative;
+}
+
+.mobile-menu-logo {
+  height: 3.8rem;
+  margin: 0 auto 0 -0.8rem;
+}
+
+/* Close button for mobile menu */
+.menu-close-button {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: cadetblue;
+  border: none;
+  cursor: pointer;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1060;
+}
+
+.menu-close-button:hover {
+  background: rgba(95, 158, 160, 0.9);
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(95, 158, 160, 0.2);
 }
 
 .nav-links a {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
   color: #333;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
+  font-size: 1.1rem;
+  transition: all 0.25s ease;
+  position: relative;
+  margin: 0.25rem 1.25rem;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateX(20px);
+  animation: slideIn 0.5s forwards;
+  animation-delay: calc(var(--index) * 0.1s);
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .nav-links a:hover {
-  color: #0056b3;
+  background-color: rgba(95, 158, 160, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(95, 158, 160, 0.05);
 }
 
-.login-btn, .logout-btn {
-  background-color: #0056b3;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
+.nav-links a.active {
+  background: rgba(95, 158, 160, 0.08);
+  color: cadetblue;
+  border-left: 3px solid cadetblue;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(95, 158, 160, 0.1);
+}
+
+.nav-icon {
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.3s ease;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-icon-svg {
+  width: 20px;
+  height: 20px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.nav-links a:hover .nav-icon,
+.nav-links a:hover .nav-icon-svg {
+  color: cadetblue;
+  transform: scale(1.1);
+}
+
+.nav-links a.active .nav-icon,
+.nav-links a.active .nav-icon-svg {
+  color: cadetblue;
+  transform: scale(1.1);
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+.header::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: -1;
   transition: background-color 0.3s ease;
+  pointer-events: none;
 }
 
-.login-btn:hover, .logout-btn:hover {
-  background-color: #003d82;
+.header.menu-open::after {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  pointer-events: auto;
+}
+
+@media (min-width: 992px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+  
+  .nav-links {
+    position: static;
+    height: auto;
+    width: auto;
+    max-width: none;
+    background-color: transparent;
+    flex-direction: row;
+    box-shadow: none;
+    padding-top: 0;
+    overflow-y: visible;
+    border-left: none;
+  }
+  
+  .mobile-menu-header {
+    display: none;
+  }
+  
+  .nav-links a {
+    padding: 1.2rem 1rem;
+    margin: 0 0.5rem;
+    opacity: 1;
+    transform: none;
+    animation: none;
+    border-radius: 0;
+    background: transparent;
+    border-left: none;
+    box-shadow: none;
+    position: relative;
+    text-decoration: none;
+  }
+  
+  /* Reset all mobile active styles */
+  .nav-links a.active {
+    background: transparent;
+    color: cadetblue;
+    font-weight: 600;
+    border-left: none;
+    box-shadow: none;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  
+  /* Remove the previous underline effect */
+  .nav-links a::after {
+    display: none;
+  }
+  
+  .nav-links a:hover::after {
+    display: none;
+  }
+  
+  .nav-links a.active::after {
+    display: none;
+  }
+  
+  /* Prevent hover transformation for desktop */
+  .nav-links a:hover {
+    background-color: transparent;
+    transform: none;
+    box-shadow: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+    color: cadetblue;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    height: 3rem;
+  }
+  
+  .header.scrolled .logo {
+    height: 2.5rem;
+  }
+  
+  .nav-links a {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+  }
+  
+  .mobile-menu-logo {
+    height: 3.2rem;
+  }
+}
+
+/* Enhanced Carousel Controls */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: cadetblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.carousel-button:hover {
+  background: cadetblue;
   color: white;
+  box-shadow: 0 6px 20px rgba(95, 158, 160, 0.4);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.carousel-button.prev {
+  left: -10px;
+}
+
+.carousel-button.next {
+  right: -10px;
+}
+
+.carousel-button svg {
+  display: block;
+  font-size: 2.4rem;
 }
 
 @media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    padding: 1rem;
+  .carousel-button {
+    width: 45px;
+    height: 45px;
   }
 
-  .nav-links {
-    flex-direction: column;
-    width: 100%;
-    gap: 1rem;
-    margin-top: 1rem;
+  .carousel-button.prev {
+    left: -5px;
   }
 
-  .logo {
+  .carousel-button.next {
+    right: -5px;
+  }
+  
+  .carousel-button svg {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-button {
+    width: 40px;
     height: 40px;
-    margin-bottom: 1rem;
+  }
+  
+  .carousel-button svg {
+    font-size: 2rem;
   }
 } 

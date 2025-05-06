@@ -636,7 +636,7 @@ const Contact = () => {
                 </a>
               </div>
             </div>
-            
+           { /*
             <div className="contact-info-card">
               <div className="contact-icon">
                 <FaClock />
@@ -649,6 +649,7 @@ const Contact = () => {
                 </a>
               </div>
             </div>
+            */}
           </div>
         </div>
       </section>

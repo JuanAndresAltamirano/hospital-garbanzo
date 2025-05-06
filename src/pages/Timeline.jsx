@@ -122,6 +122,7 @@ const Timeline = () => {
               </div>
               
               <div className="timeline-card">
+                <span className="timeline-year-mobile">{event.year}</span>
                 <h3 className="timeline-title">{event.title}</h3>
                 
                 {event.image && (

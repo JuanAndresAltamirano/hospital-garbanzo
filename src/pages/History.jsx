@@ -10,10 +10,11 @@ const History = () => {
     timeline: false,
     commitment: false
   });
+  const sectionsRef = useRef({});
 
   useEffect(() => {
     const observerOptions = {
-      rootMargin: '0px',
+      rootMargin: '0px 0px -100px 0px',
       threshold: 0.15
     };
     
@@ -30,36 +31,29 @@ const History = () => {
     
     const observer = new IntersectionObserver(observerCallback, observerOptions);
     
-    const visionSection = document.querySelector('.vision-mission-container');
-    const valuesSection = document.querySelector('.values-grid-section');
-    const timelineSection = document.querySelector('.timeline-section');
-    const commitmentSection = document.querySelector('.history-commitment-section');
+    const sections = {
+      vision: document.querySelector('.vision-mission-container'),
+      values: document.querySelector('.values-grid-section'),
+      timeline: document.querySelector('.timeline-section'),
+      commitment: document.querySelector('.history-commitment-section')
+    };
     
-    if (visionSection) {
-      visionSection.dataset.section = 'vision';
-      observer.observe(visionSection);
-    }
+    // Store refs for cleanup
+    sectionsRef.current = sections;
     
-    if (valuesSection) {
-      valuesSection.dataset.section = 'values';
-      observer.observe(valuesSection);
-    }
-    
-    if (timelineSection) {
-      timelineSection.dataset.section = 'timeline';
-      observer.observe(timelineSection);
-    }
-    
-    if (commitmentSection) {
-      commitmentSection.dataset.section = 'commitment';
-      observer.observe(commitmentSection);
-    }
+    // Set data attributes and observe
+    Object.entries(sections).forEach(([key, section]) => {
+      if (section) {
+        section.dataset.section = key;
+        observer.observe(section);
+      }
+    });
     
     return () => {
-      if (visionSection) observer.unobserve(visionSection);
-      if (valuesSection) observer.unobserve(valuesSection);
-      if (timelineSection) observer.unobserve(timelineSection);
-      if (commitmentSection) observer.unobserve(commitmentSection);
+      // Cleanup observer
+      Object.values(sectionsRef.current).forEach(section => {
+        if (section) observer.unobserve(section);
+      });
     };
   }, []);
 

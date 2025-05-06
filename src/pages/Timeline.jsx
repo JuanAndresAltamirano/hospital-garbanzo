@@ -42,7 +42,7 @@ const Timeline = () => {
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
     );
 
     const timelineItems = document.querySelectorAll('.timeline-entry');
@@ -61,7 +61,13 @@ const Timeline = () => {
     try {
       const data = await timelineService.getAll();
       // Sort by year
-      const sortedData = [...data].sort((a, b) => a.year - b.year);
+      const sortedData = [...data].sort((a, b) => {
+        // Handle year ranges like "2010-2020" by comparing the first number
+        const yearA = parseInt(a.year.toString().split('-')[0]);
+        const yearB = parseInt(b.year.toString().split('-')[0]);
+        return yearA - yearB;
+      });
+      
       setTimelines(sortedData.length > 0 ? sortedData : defaultTimelineEntries);
     } catch (error) {
       console.error('Error fetching timelines:', error);
@@ -111,10 +117,11 @@ const Timeline = () => {
         <div className="timeline">
           <div className="timeline-line"></div>
           
-          {timelines.map((event) => (
+          {timelines.map((event, index) => (
             <div 
               className="timeline-entry"
               key={event.id}
+              style={{ transitionDelay: `${index * 0.1}s` }}
             >
               <div className="timeline-marker">
                 <span className="timeline-date">{event.year}</span>
@@ -129,13 +136,13 @@ const Timeline = () => {
                   <div className="timeline-media">
                     <img
                       src={getImageUrl(event.image)}
-                      alt={event.title}
+                      alt={`${event.title} - Año ${event.year}`}
+                      loading="lazy"
                       onError={(e) => {
                         console.error('Timeline image load error:', e.target.src);
                         e.target.onerror = null; // Prevent infinite loop
-                        e.target.src = '/placeholder-image.jpg';
+                        e.target.style.display = 'none'; // Hide broken images in mobile
                       }}
-                      loading="lazy"
                     />
                   </div>
                 )}

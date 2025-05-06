@@ -427,6 +427,12 @@
     font-size: 2.8rem;
   }
   
+  .history-hero h1:after {
+    width: 60px;
+    height: 3px;
+    margin: 12px auto 0;
+  }
+  
   .vision, .mission {
     padding: 2.5rem;
   }
@@ -456,16 +462,24 @@
 
 @media (max-width: 768px) {
   .history-hero {
-    padding: 3rem 0;
+    padding: 3.5rem 0 2.5rem;
   }
 
   .history-hero h1 {
     font-size: 2rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .history-hero h1:after {
+    width: 60px;
+    height: 3px;
+    margin: 12px auto 0;
   }
   
   .history-intro {
     font-size: 1rem;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
+    line-height: 1.7;
   }
   
   .vision-mission-container {
@@ -476,6 +490,10 @@
   
   .vision, .mission {
     padding: 2.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 
+      0 10px 25px rgba(0, 0, 0, 0.06),
+      0 5px 15px rgba(0, 0, 0, 0.04);
   }
   
   .card-icon {
@@ -509,12 +527,39 @@
   }
   
   .timeline-section {
-    padding: 3rem 1.5rem;
+    padding: 3.5rem 1rem 3.5rem;
+  }
+  
+  .timeline-header-container {
+    margin: 1rem auto 2.5rem;
+  }
+  
+  .timeline-section .section-title {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .timeline-section .section-subtitle {
+    font-size: 1rem;
+    padding: 0 1rem;
+    line-height: 1.6;
   }
   
   .timeline-wrapper {
-    width: 92%;
-    padding: 3rem 1rem 1rem;
+    width: 94%;
+    padding: 2rem 0.75rem 1rem;
+    border-radius: 12px;
+    box-shadow: 
+      0 12px 30px rgba(0, 0, 0, 0.12),
+      0 4px 8px rgba(0, 0, 0, 0.06);
+    margin-top: 1rem;
+  }
+  
+  .timeline-wrapper:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+      0 15px 35px rgba(0, 0, 0, 0.15),
+      0 5px 15px rgba(0, 0, 0, 0.08);
   }
   
   .history-commitment-section {
@@ -523,16 +568,85 @@
   
   .history-commitment {
     padding: 2.5rem 2rem;
-    margin: 4rem 1.5rem 1rem;
+    margin: 0 1rem;
     border-radius: 12px;
   }
   
   .history-commitment h2 {
     font-size: 1.6rem;
+    margin-bottom: 1.2rem;
   }
   
   .history-commitment p {
-    font-size: 1.05rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+  
+  .commitment-cta {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-hero {
+    padding: 3rem 0 2rem;
+  }
+  
+  .history-hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .history-intro {
+    font-size: 0.95rem;
+    padding: 0 1.2rem;
+  }
+  
+  .vision, .mission {
+    padding: 2rem 1.5rem;
+  }
+  
+  .vision h2, .mission h2 {
+    font-size: 1.6rem;
+  }
+  
+  .vision p, .mission p {
+    font-size: 0.95rem;
+  }
+  
+  .values-title {
+    font-size: 1.8rem;
+  }
+  
+  .timeline-section {
+    padding: 3rem 0.75rem 3rem;
+  }
+  
+  .timeline-section .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .timeline-section .section-subtitle {
+    font-size: 0.95rem;
+    padding: 0 0.75rem;
+  }
+  
+  .timeline-wrapper {
+    width: 96%;
+    padding: 1.5rem 0.5rem 1rem;
+  }
+  
+  .history-commitment h2 {
+    font-size: 1.5rem;
+  }
+  
+  .history-commitment p {
+    font-size: 0.95rem;
   }
 }
 

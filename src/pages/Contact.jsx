@@ -286,6 +286,7 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                         <FaImage />
                         <span>{subcategory.description || subcategory.name}</span>
                       </div>
+
                     </div>
                     <div className="gallery-caption">{ subcategory.name}</div>
                   </div>
@@ -728,4 +729,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

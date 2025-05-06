@@ -13,7 +13,7 @@
 *.sublime-project
 *.sublime-workspace
 
-# Exclude image files except those in src/assets
+# Exclude image files EXCEPT those in src/assets
 *.jpg
 *.png
 *.jpeg
@@ -22,7 +22,7 @@
 *.webp
 *.ico
 
-# But allow images in assets directory
+# Allow image files in the assets directory
 !src/assets/**/*.jpg
 !src/assets/**/*.png
 !src/assets/**/*.jpeg

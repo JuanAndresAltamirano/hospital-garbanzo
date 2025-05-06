@@ -16,6 +16,7 @@
   transform: translateY(30px);
   transition: opacity 1s ease-out, transform 1s ease-out;
   will-change: opacity, transform;
+  pointer-events: auto !important;
 }
 
 .promotions-section.animate-in,
@@ -23,6 +24,7 @@
 .cta.animate-in {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto !important;
 }
 
 .animated-element {
@@ -30,11 +32,13 @@
   transform: translateY(20px);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
   transition-delay: 0.2s;
+  pointer-events: auto !important;
 }
 
 .animate-in .animated-element {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto !important;
 }
 
 .animate-in .animated-element:nth-child(1) { transition-delay: 0.1s; }
@@ -713,6 +717,9 @@
 /* Keep the base animation settings from our global animation styles */
 .carousel-container {
   margin-top: 2rem;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto !important;
 }
 
 /* Enhanced animation for carousel items */

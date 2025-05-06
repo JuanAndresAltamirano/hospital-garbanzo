@@ -113,6 +113,11 @@ const PromotionCarousel = ({ promotions }) => {
     );
     setTimeout(() => setIsAnimating(false), 500);
   };
+  
+  const handleMoreInfoClick = (e, promotionId) => {
+    e.stopPropagation(); // Prevent event bubbling
+    window.open(`/promociones/${promotionId}`, '_blank');
+  };
 
   if (!promotions || promotions.length === 0) {
     return null;
@@ -194,9 +199,17 @@ const PromotionCarousel = ({ promotions }) => {
                         </div>
                       )}
                       
-                      <button className="learn-more-btn">
-                        Más Información <FaArrowRight />
-                      </button>
+                      <div className="promotion-button-wrapper">
+                        <a 
+                          href={`/promociones/${promotion.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="promotion-button"
+                          onClick={(e) => handleMoreInfoClick(e, promotion.id)}
+                        >
+                          Más Información <FaArrowRight />
+                        </a>
+                      </div>
                     </div>
                     <div className="promotion-image">
                       <img 
@@ -206,7 +219,6 @@ const PromotionCarousel = ({ promotions }) => {
                           e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
                         }}
                       />
-              
                     </div>
                   </div>
                 </div>

@@ -167,7 +167,7 @@ const Home = () => {
             </div>
           ) : (
             promotions.length > 0 ? (
-              <div className="carousel-container animated-element">
+              <div className="carousel-container animated-element" style={{ pointerEvents: 'auto' }}>
                 <PromotionCarousel promotions={promotions} />
               </div>
             ) : (

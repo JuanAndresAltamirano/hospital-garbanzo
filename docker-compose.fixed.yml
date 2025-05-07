@@ -7,14 +7,16 @@ services:
       context: .
       dockerfile: Dockerfile.frontend.prod
     restart: always
+    depends_on:
+      - backend
     networks:
       - app-network
 
   backend:
-    container_name: clinica_mullo_backend
     build:
       context: ./backend-nest
-      dockerfile: Dockerfile.backend.fixed.prod
+      dockerfile: Dockerfile.backend.prod
+    container_name: clinica_mullo_backend
     restart: always
     depends_on:
       db:
@@ -26,9 +28,9 @@ services:
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USERNAME=root
-      - DB_PASSWORD=change_this_password
+      - DB_PASSWORD=StrongPassword123
       - DB_DATABASE=clinica_mullo
-      - JWT_SECRET=change_this_very_secret_key
+      - JWT_SECRET=SuperSecretKey123456789
       - JWT_EXPIRATION_TIME=86400
     logging:
       driver: "json-file"
@@ -42,14 +44,14 @@ services:
     image: mysql:8.0
     container_name: clinica_mullo_db
     environment:
-      MYSQL_ROOT_PASSWORD: change_this_password
+      MYSQL_ROOT_PASSWORD: StrongPassword123
       MYSQL_DATABASE: clinica_mullo
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pchange_this_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pStrongPassword123"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -58,7 +60,7 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: clinica_mullo_nginx
+    container_name: nginx
     ports:
       - "80:80"
       - "443:443"

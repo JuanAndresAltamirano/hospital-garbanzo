@@ -299,7 +299,7 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                           }}
                         />
                         <div className="gallery-overlay">
-                          <FaImage />
+                          <FaImage aria-hidden="true" style={{ fontSize: '2rem', marginBottom: '0.75rem' }} />
                           <span>{subcategory.description || subcategory.name}</span>
                         </div>
                       </div>

@@ -274,44 +274,46 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
               <p>Cargando imágenes</p>
             </div>
           ) : (
-            <div className="gallery-grid">
-              {currentCategory?.subcategories && currentCategory.subcategories.length > 0 ? (
-                currentCategory.subcategories.map((subcategory, index) => (
-                  <div 
-                    className="gallery-item" 
-                    key={index}
-                    onClick={() => onImageClick(currentCategory.id, 0, subcategory.id)}
-                  >
-                    <div className="gallery-image-container">
-                      <img 
-                        src={subcategory.images && subcategory.images.length > 0 
-                          ? (subcategory.images[0].src.startsWith('http') 
-                             ? subcategory.images[0].src 
-                             : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`)
-                          : 'https://via.placeholder.com/300x250?text=No+Image'}
-                        alt={subcategory.name || 'Imagen de galería'} 
-                        loading="lazy"
-                        onError={(e) => {
-                          console.error('Image failed to load:', e.target.src);
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
-                        }}
-                      />
-                      <div className="gallery-overlay">
-                        <FaImage />
-                        <span>{subcategory.description || subcategory.name}</span>
+            <div className="gallery-container">
+              <div className="gallery-grid">
+                {currentCategory?.subcategories && currentCategory.subcategories.length > 0 ? (
+                  currentCategory.subcategories.map((subcategory, index) => (
+                    <div 
+                      className="gallery-item" 
+                      key={index}
+                      onClick={() => onImageClick(currentCategory.id, 0, subcategory.id)}
+                    >
+                      <div className="gallery-image-container">
+                        <img 
+                          src={subcategory.images && subcategory.images.length > 0 
+                            ? (subcategory.images[0].src.startsWith('http') 
+                              ? subcategory.images[0].src 
+                              : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`)
+                            : 'https://via.placeholder.com/300x250?text=No+Image'}
+                          alt={subcategory.name || 'Imagen de galería'} 
+                          loading="lazy"
+                          onError={(e) => {
+                            console.error('Image failed to load:', e.target.src);
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
+                          }}
+                        />
+                        <div className="gallery-overlay">
+                          <FaImage />
+                          <span>{subcategory.description || subcategory.name}</span>
+                        </div>
+                      </div>
+                      <div className="gallery-content">
+                        <h3>{subcategory.name}</h3>
                       </div>
                     </div>
-                    <div className="gallery-content">
-                      <h3>{subcategory.name}</h3>
-                    </div>
+                  ))
+                ) : (
+                  <div className="no-images-message">
+                    <p>No hay subcategorías disponibles para esta categoría</p>
                   </div>
-                ))
-              ) : (
-                <div className="no-images-message">
-                  <p>No hay subcategorías disponibles para esta categoría</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
         </div>

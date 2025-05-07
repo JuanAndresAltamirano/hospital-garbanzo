@@ -790,54 +790,21 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+  align-items: stretch;
 }
 
+/* Remove these duplicated rules */
 /* Make each row have equal heights */
 .gallery-grid::before {
-  content: '';
-  width: 0;
-  padding-bottom: 100%;
-  grid-row: 1 / 1;
-  grid-column: 1 / 1;
+  content: none;
 }
 
 .gallery-grid > *:first-child {
-  grid-row: 1 / 1;
-  grid-column: 1 / 1;
+  grid-row: auto;
+  grid-column: auto;
 }
 
-/* Mobile category indicator */
-.mobile-category-indicator {
-  display: none;
-  text-align: center;
-  margin-bottom: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.mobile-category-indicator span {
-  font-weight: 600;
-  color: cadetblue;
-  font-size: 1.1rem;
-}
-
-.mobile-nav-hint {
-  margin-top: 0.25rem;
-}
-
-.mobile-nav-hint small {
-  opacity: 0.6;
-  font-size: 0.8rem;
-}
-
-/* Enhanced gallery grid for mobile */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
+/* Ensure consistent gallery item sizing */
 .gallery-item {
   display: flex;
   flex-direction: column;
@@ -874,7 +841,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Darker overlay for better visibility */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -961,7 +928,7 @@
   }
   
   .gallery-image-container {
-    height: 160px;
+    padding-top: 66.67%; /* Keep aspect ratio consistent */
   }
   
   .gallery-overlay {
@@ -987,7 +954,7 @@
 
 @media (max-width: 480px) {
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
   }
   
@@ -1867,8 +1834,12 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   flex-grow: 1;
   background-color: white;
+  min-height: 80px;
+  height: 80px; /* Fixed height for consistency */
 }
 
 .gallery-content h3 {
@@ -1877,4 +1848,8 @@
   color: #2c5558; /* Darker cadetblue */
   text-align: center;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 } 

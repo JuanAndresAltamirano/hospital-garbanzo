@@ -202,6 +202,18 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [loadingImages, setLoadingImages] = useState(false);
   
+  // Debug logging
+  useEffect(() => {
+    console.log('CategorizedGallery received categories:', categories);
+    if (categories && categories.length > 0) {
+      console.log('First category:', categories[0]);
+      if (categories[0].subcategories && categories[0].subcategories.length > 0) {
+        console.log('First subcategory of first category:', categories[0].subcategories[0]);
+        console.log('Images in first subcategory:', categories[0].subcategories[0].images);
+      }
+    }
+  }, [categories]);
+  
   // Set first category as active by default
   useEffect(() => {
     if (categories && categories.length > 0 && !activeCategory) {
@@ -273,13 +285,17 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                         src={subcategory.images && subcategory.images.length > 0 
                           ? (subcategory.images[0].src.startsWith('http') 
                              ? subcategory.images[0].src 
-                             : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${subcategory.images[0].src}`)
+                             : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`)
                           : 'https://via.placeholder.com/300x250?text=No+Image'}
                         alt={subcategory.name || 'Imagen de galería'} 
                         loading="lazy"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={(e) => {
                           console.error('Image failed to load:', e.target.src);
+                          // Debug what URL we actually tried to load
+                          console.error('Original image src:', subcategory.images[0].src);
+                          console.error('VITE_API_URL:', import.meta.env.VITE_API_URL);
+                          console.error('Constructed URL:', `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`);
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
                         }}
@@ -384,7 +400,7 @@ const GalleryModal = ({ isOpen, categories, subcategoryImages, currentCategory, 
           <img 
             src={currentImage.src.startsWith('http') 
                  ? currentImage.src 
-                 : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${currentImage.src}`} 
+                 : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${currentImage.src}`} 
             alt={currentImage.alt || 'Imagen ampliada'} 
             className="gallery-modal-image"
             onError={handleImageError}

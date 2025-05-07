@@ -144,32 +144,59 @@ export const galleryService = {
     try {
       const categories = await apiService.get('/gallery/categories');
       
+      console.log('Raw gallery categories data:', categories.data);
+      
+      // Helper function to handle image src URL
+      const formatImageSrc = (src) => {
+        if (!src) return '';
+        // If it's already an absolute URL, keep it as is
+        if (src.startsWith('http')) return src;
+        // If it already has /uploads/ prefix, leave it as is
+        if (src.startsWith('/uploads/')) return src;
+        // Otherwise, ensure it has the /uploads/ prefix
+        return `/uploads/${src.replace(/^\//, '')}`;
+      };
+      
       // Format data for the frontend gallery
       const formattedGallery = {
         title: "Galería de Imágenes",
         subtitle: "Conozca nuestras instalaciones y servicios a través de nuestra galería",
-        categories: categories.data.map(category => ({
-          id: category.id.toString(),
-          name: category.name,
-          description: category.description,
-          images: category.images?.map(image => ({
-            id: image.id,
-            src: image.src,
-            alt: image.alt || '',
-            caption: image.caption || ''
-          })) || [],
-          subcategories: category.subcategories?.map(subcategory => ({
-            id: subcategory.id.toString(),
-            name: subcategory.name,
-            description: subcategory.description,
-            images: subcategory.images?.map(image => ({
-              id: image.id,
-              src: image.src,
-              alt: image.alt || '',
-              caption: image.caption || ''
-            })) || []
-          })) || []
-        })),
+        categories: categories.data.map(category => {
+          console.log(`Processing category: ${category.name}, images:`, category.images);
+          
+          return {
+            id: category.id.toString(),
+            name: category.name,
+            description: category.description,
+            images: category.images?.map(image => {
+              console.log(`  Image in category ${category.name}:`, image.src);
+              return {
+                id: image.id,
+                src: formatImageSrc(image.src),
+                alt: image.alt || '',
+                caption: image.caption || ''
+              };
+            }) || [],
+            subcategories: category.subcategories?.map(subcategory => {
+              console.log(`  Processing subcategory: ${subcategory.name}, images:`, subcategory.images);
+              
+              return {
+                id: subcategory.id.toString(),
+                name: subcategory.name,
+                description: subcategory.description,
+                images: subcategory.images?.map(image => {
+                  console.log(`    Image in subcategory ${subcategory.name}:`, image.src);
+                  return {
+                    id: image.id,
+                    src: formatImageSrc(image.src),
+                    alt: image.alt || '',
+                    caption: image.caption || ''
+                  };
+                }) || []
+              };
+            }) || []
+          };
+        }),
         getAllImages: function() {
           let allImages = [];
           

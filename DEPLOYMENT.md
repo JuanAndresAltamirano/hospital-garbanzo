@@ -1,118 +1,64 @@
-# Deployment Guide for Contabo VPS
+# Deployment Guide for Clinica Mullo
 
-This guide explains how to deploy this website to a Contabo VPS.
+This guide will help you deploy your application to your server.
 
 ## Prerequisites
 
-- A Contabo VPS with SSH access
-- A domain name pointing to your VPS IP address
-- Basic knowledge of Linux commands
+- Server with Docker and Docker Compose installed
+- Domain (clinicamullo.com) pointing to your server IP (173.212.204.174)
 
 ## Deployment Steps
 
-1. **Clone the repository to your VPS**
+1. First, make sure all the files we've created are in your project:
+   - docker-compose.prod.yml
+   - .env.production
+   - nginx/conf.d/default.conf.init
+   - nginx/conf.d/default.conf.https
+   - deploy-ssl.sh
+   - nginx/www/502.html
 
+2. Make the deployment script executable:
    ```bash
-   git clone <your-repository-url> /path/to/your/app
-   cd /path/to/your/app
+   chmod +x deploy-ssl.sh
    ```
 
-2. **Configure environment variables**
-
-   Edit the `.env.production` file and update it with your specific configuration:
-   
+3. Run the deployment script:
    ```bash
-   nano .env.production
-   ```
-   
-   Make sure to update:
-   - Database credentials
-   - Domain name
-   - Admin email
-   - JWT secret
-
-3. **Run the deployment script**
-
-   ```bash
-   sudo ./deploy.sh
+   ./deploy-ssl.sh
    ```
 
-   This script will:
-   - Create necessary directories
-   - Install Docker and Docker Compose if not already installed
-   - Start all the services defined in docker-compose.prod.yml
-   - Check if Nginx is running properly
-
-4. **SSL Certificate Setup**
-
-   The deployment includes automatic SSL certificate generation with Certbot. If you encounter any issues, you can manually request certificates:
-
-   ```bash
-   docker-compose -f docker-compose.prod.yml run --rm certbot certonly --webroot --webroot-path=/var/www/certbot --email your@email.com --agree-tos --no-eff-email -d yourdomain.com
-   ```
-
-5. **Verify Deployment**
-
-   Visit your domain in a web browser to verify that your website is deployed correctly.
-
-## Maintenance
-
-### Checking Service Status
-
-```bash
-docker-compose -f docker-compose.prod.yml ps
-```
-
-### Viewing Logs
-
-```bash
-docker-compose -f docker-compose.prod.yml logs -f
-```
-
-### Restarting Services
-
-```bash
-docker-compose -f docker-compose.prod.yml restart
-```
-
-### Stopping Services
-
-```bash
-docker-compose -f docker-compose.prod.yml down
-```
-
-### Updating the Application
-
-To update your application after making changes:
-
-1. Pull the latest changes from your repository:
-   ```bash
-   git pull
-   ```
-
-2. Rebuild and restart the services:
-   ```bash
-   docker-compose -f docker-compose.prod.yml up -d --build
-   ```
-
-## Backup Strategy
-
-### Database Backup
-
-To backup the MySQL database:
-
-```bash
-docker exec clinica_mullo_db mysqldump -u root -p<your-password> clinica_mullo > backup_$(date +%Y%m%d).sql
-```
-
-### Restoring a Backup
-
-```bash
-cat backup_file.sql | docker exec -i clinica_mullo_db mysql -u root -p<your-password> clinica_mullo
-```
+The script will:
+- Create all necessary directories
+- Deploy your application with HTTP first to get SSL certificates
+- Configure HTTPS once certificates are obtained
+- Restart Nginx to apply the HTTPS configuration
 
 ## Troubleshooting
 
-- **Nginx not starting**: Check Nginx configuration using `docker-compose -f docker-compose.prod.yml logs nginx`
-- **Database connection issues**: Verify the database credentials in `.env.production`
-- **SSL certificate problems**: Check Certbot logs with `docker-compose -f docker-compose.prod.yml logs certbot` 
+If you encounter issues:
+
+1. Check the container logs:
+   ```bash
+   docker-compose -f docker-compose.prod.yml logs
+   ```
+
+2. Check specific service logs:
+   ```bash
+   docker-compose -f docker-compose.prod.yml logs backend
+   docker-compose -f docker-compose.prod.yml logs frontend
+   docker-compose -f docker-compose.prod.yml logs nginx
+   ```
+
+3. If certbot fails, try running it manually:
+   ```bash
+   docker-compose -f docker-compose.prod.yml run --rm certbot certonly --webroot --webroot-path=/var/www/certbot --email admin@clinicamullo.com --agree-tos --no-eff-email -d clinicamullo.com -d www.clinicamullo.com --force-renewal
+   ```
+
+## Restarting Your Application
+
+If you need to restart the application:
+
+```bash
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml up -d
+``` 

@@ -13,13 +13,13 @@ services:
       - app-network
 
   backend:
+    container_name: clinica_mullo_backend
     build:
       context: ./backend-nest
       dockerfile: Dockerfile.backend.prod
     restart: always
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     volumes:
       - ./uploads:/app/uploads
     environment:
@@ -27,10 +27,10 @@ services:
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USERNAME=root
-      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - DB_DATABASE=${MYSQL_DATABASE}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION_TIME=${JWT_EXPIRATION_TIME}
+      - DB_PASSWORD=Hospital2024!
+      - DB_DATABASE=clinica_mullo
+      - JWT_SECRET=clinicaMullo2024SecretKey
+      - JWT_EXPIRATION_TIME=86400
     logging:
       driver: "json-file"
       options:
@@ -43,23 +43,24 @@ services:
     image: mysql:8.0
     container_name: clinica_mullo_db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: Hospital2024!
+      MYSQL_DATABASE: clinica_mullo
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     networks:
       - app-network
 
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: clinica_mullo_nginx
     ports:
       - "80:80"
       - "443:443"
@@ -78,10 +79,13 @@ services:
 
   certbot:
     image: certbot/certbot
+    container_name: clinica_mullo_certbot
     volumes:
       - ./certbot/etc/letsencrypt:/etc/letsencrypt
       - ./certbot/var/www/certbot:/var/www/certbot
-    command: certonly --webroot --webroot-path=/var/www/certbot --email ${ADMIN_EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME}
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@clinicamullo.com --agree-tos --no-eff-email -d clinicamullo.com -d www.clinicamullo.com --force-renewal
+    depends_on:
+      - nginx
 
 volumes:
   mysql_data:

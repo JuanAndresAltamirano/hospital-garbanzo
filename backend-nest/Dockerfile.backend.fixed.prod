@@ -1,0 +1,30 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci
+
+# Copy the rest of the application
+COPY . .
+
+# Directly modify the database configuration
+# This ensures database credentials are hardcoded
+RUN sed -i 's/configService.get('\''DB_HOST'\'') || '\''localhost'\''/'\''db'\''/g' src/app.module.ts
+RUN sed -i 's/configService.get('\''DB_PORT'\'') ? +configService.get('\''DB_PORT'\'') : 3306/3306/g' src/app.module.ts
+RUN sed -i 's/configService.get('\''DB_USERNAME'\'') || '\''root'\''/'\''root'\''/g' src/app.module.ts
+RUN sed -i 's/configService.get('\''DB_PASSWORD'\'') || '\'''\''/'\''change_this_password'\''/g' src/app.module.ts
+RUN sed -i 's/configService.get('\''DB_DATABASE'\'') || '\''hospital'\''/'\''clinica_mullo'\''/g' src/app.module.ts
+
+# Build the application
+RUN npm run build
+
+# Create uploads directory
+RUN mkdir -p uploads
+
+# Expose the application port
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "dist/main"] 

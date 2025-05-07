@@ -290,7 +290,6 @@ const PromotionCarousel = ({ promotions }) => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="promotion-button"
-                          onClick={(e) => handleMoreInfoClick(e, promotion.id)}
                         >
                           Más Información <FaArrowRight aria-hidden="true" />
                         </a>

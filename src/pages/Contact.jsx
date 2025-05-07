@@ -289,7 +289,6 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                           : 'https://via.placeholder.com/300x250?text=No+Image'}
                         alt={subcategory.name || 'Imagen de galería'} 
                         loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={(e) => {
                           console.error('Image failed to load:', e.target.src);
                           // Debug what URL we actually tried to load
@@ -304,9 +303,10 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                         <FaImage />
                         <span>{subcategory.description || subcategory.name}</span>
                       </div>
-
                     </div>
-                    <div className="gallery-caption">{ subcategory.name}</div>
+                    <div className="gallery-content">
+                      <h3>{subcategory.name}</h3>
+                    </div>
                   </div>
                 ))
               ) : (

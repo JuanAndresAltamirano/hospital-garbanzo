@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import Timeline from './Timeline';
+import { Link } from 'react-router-dom';
 import './History.css';
 
 const History = () => {
@@ -138,6 +139,11 @@ const History = () => {
               <p>Laboratorio clínico, imagenología, rehabilitación física, vacunatorio y farmacia.</p>
             </div>
           </div>
+          <div className="text-center mt-4">
+            <Link to="/servicios" className="btn btn-primary">
+              Ver todos los servicios
+            </Link>
+          </div>
         </div>
 
         {/* Simple gradient transition */}
@@ -168,7 +174,7 @@ const History = () => {
               Nuestro equipo de profesionales médicos, enfermeros y personal administrativo trabaja incansablemente
               para proporcionar la mejor atención posible, manteniéndonos fieles a nuestra misión de mejorar la calidad de vida de nuestros pacientes.
             </p>
-            <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20contactarles" className="btn btn-primary commitment-cta" target="_blank" rel="noopener noreferrer">Contáctanos</a>
+            <Link to="/contacto" className="btn btn-primary commitment-cta">Contáctanos</Link>
           </div>
         </div>
       </div>

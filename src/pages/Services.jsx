@@ -163,7 +163,7 @@ const Services = () => {
   };
 
   const handleServiceDetails = (serviceId) => {
-    navigate(`/services/${serviceId}`);
+    navigate(`/servicios/${serviceId}`);
   };
 
   if (loading) {

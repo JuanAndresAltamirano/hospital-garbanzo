@@ -6,6 +6,7 @@ import PromotionCarousel from '../components/PromotionCarousel';
 import { apiService } from '../services/apiService';
 import './Home.css';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [promotions, setPromotions] = useState([]);
@@ -151,7 +152,7 @@ const Home = () => {
           <h1>CENTRO DE ESPECIALIDADES MÉDICAS DR. MARCO V. MULLO</h1>
           <p className="hero-subtitle">Cuidamos de ti y tu familia con excelencia y calidez</p>
           <div className="hero-buttons">
-            <a href="/servicios" className="btn btn-primary">Nuestros Servicios</a>
+            <Link to="/servicios" className="btn btn-primary">Nuestros Servicios</Link>
             <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="btn btn-outline" target="_blank" rel="noopener noreferrer">Agendar Cita</a>
           </div>
         </div>
@@ -181,9 +182,9 @@ const Home = () => {
           <h1>Su salud es nuestra prioridad</h1>
           <p className="hero-subtitle">Atención médica de calidad con los mejores especialistas</p>
           <div className="hero-buttons">
-            <a href="/servicios" className="btn btn-primary">
+            <Link to="/servicios" className="btn btn-primary">
               Nuestros Servicios <FaChevronRight />
-            </a>
+            </Link>
             <a href="https://wa.me/593967758178?text=Hola%2C%20quisiera%20agendar%20una%20cita" className="btn btn-primary btn-llamar" target="_blank" rel="noopener noreferrer">
               <FaCalendarCheck /> Agendar Cita
             </a>

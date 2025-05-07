@@ -14,6 +14,11 @@ docker rm $(docker ps -a -q) 2>/dev/null || true
 echo "Removing specific containers if they exist..."
 docker rm -f clinica_mullo_frontend clinica_mullo_backend clinica_mullo_db nginx 2>/dev/null || true
 
+# Clean docker volumes to ensure fresh database state
+echo "Cleaning docker volumes..."
+docker volume rm mysql_data 2>/dev/null || true
+docker volume create mysql_data
+
 # Create required directories
 echo "Creating required directories..."
 mkdir -p nginx/conf.d
@@ -46,25 +51,21 @@ EOL
     echo "Created SSL params configuration"
 fi
 
-# Update the nginx default.conf 
-echo "Updating Nginx configuration..."
+# Update the nginx default.conf - SIMPLIFIED VERSION WITHOUT SSL
+echo "Creating simplified Nginx configuration without SSL..."
 cat > nginx/conf.d/default.conf << EOL
 server {
     listen 80;
     server_name clinicamullo.com www.clinicamullo.com;
     
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
+    # Increase client max body size for uploads
+    client_max_body_size 50M;
     
-    # Frontend
+    # Frontend - direct to static files first
     location / {
-        proxy_pass http://frontend:80;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files \$uri \$uri/ /index.html;
     }
     
     # Backend API
@@ -75,6 +76,11 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # Add longer timeouts
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
         
         # CORS headers
         add_header 'Access-Control-Allow-Origin' '*' always;
@@ -108,11 +114,18 @@ cat > docker-compose.fixed.yml << EOL
 version: '3.8'
 
 services:
-  frontend:
-    container_name: clinica_mullo_frontend
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend.prod
+  db:
+    image: mysql:8.0
+    container_name: clinica_mullo_db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: clinica_mullo
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: password123
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
     restart: always
     networks:
       - app-network
@@ -132,27 +145,26 @@ services:
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USERNAME=root
-      - DB_PASSWORD=StrongPassword123
+      - DB_PASSWORD=password123
       - DB_DATABASE=clinica_mullo
       - JWT_SECRET=SuperSecretKey123456789
       - JWT_EXPIRATION_TIME=86400
     networks:
       - app-network
+    ports:
+      - "3000:3000"
 
-  db:
-    image: mysql:8.0
-    container_name: clinica_mullo_db
-    environment:
-      MYSQL_ROOT_PASSWORD: StrongPassword123
-      MYSQL_DATABASE: clinica_mullo
-    volumes:
-      - mysql_data:/var/lib/mysql
+  frontend:
+    container_name: clinica_mullo_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.prod
     restart: always
     networks:
       - app-network
 
   nginx:
-    image: nginx:latest
+    image: nginx:stable
     container_name: clinica_mullo_nginx
     ports:
       - "80:80"
@@ -161,6 +173,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/www:/var/www/html
+      - ./uploads:/usr/share/nginx/html/uploads
     depends_on:
       - frontend
       - backend
@@ -170,14 +183,51 @@ services:
 
 volumes:
   mysql_data:
+    external: false
 
 networks:
   app-network:
     driver: bridge
 EOL
 
-# Deploy with the fixed docker-compose file
-echo "Deploying with fixed docker-compose file..."
+# Create a database initialization script for test data
+echo "Creating database initialization script..."
+mkdir -p database
+cat > database/01-init.sql << EOL
+-- Create a simple test table
+CREATE TABLE IF NOT EXISTS test (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert some test data
+INSERT INTO test (name) VALUES ('Test 1');
+INSERT INTO test (name) VALUES ('Test 2');
+EOL
+
+# Create the permissions script to ensure root access from any host
+cat > database/00-setup-permissions.sql << EOL
+-- Grant privileges to root user from any host
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'password123';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+
+-- Create application user
+CREATE USER IF NOT EXISTS 'dbuser'@'%' IDENTIFIED BY 'password123';
+GRANT ALL PRIVILEGES ON clinica_mullo.* TO 'dbuser'@'%';
+
+-- Flush privileges to apply changes
+FLUSH PRIVILEGES;
+EOL
+
+# First, start just the database to ensure it initializes properly
+echo "Starting database container first..."
+docker-compose -f docker-compose.fixed.yml up -d db
+echo "Waiting for database to initialize (30 seconds)..."
+sleep 30
+
+# Deploy the rest of the services
+echo "Starting remaining services..."
 docker-compose -f docker-compose.fixed.yml up -d
 
 echo "Deployment complete! Waiting for services to start..."
@@ -185,6 +235,31 @@ sleep 10
 
 echo "Checking service status..."
 docker-compose -f docker-compose.fixed.yml ps
+
+# Verify database connection
+echo "Verifying database connection..."
+docker exec clinica_mullo_db mysql -uroot -ppassword123 -e "SHOW DATABASES;"
+
+# Check backend logs to verify database connection
+echo "Checking backend logs..."
+docker logs clinica_mullo_backend
+
+# Modify frontend container to use correct nginx config
+echo "Creating simple Nginx config for frontend container..."
+docker exec clinica_mullo_frontend sh -c 'cat > /etc/nginx/conf.d/default.conf << EOF
+server {
+    listen 80;
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOF'
+
+# Restart frontend to apply new config
+echo "Restarting frontend container..."
+docker restart clinica_mullo_frontend
 
 # Display access information
 echo ""

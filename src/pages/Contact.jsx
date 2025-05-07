@@ -248,8 +248,10 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
   return (
     <section className="gallery-section animate-in">
       <div className="container">
-        {title && <h2 className="section-title">{title}</h2>}
-        {subtitle && <p className="section-subtitle">{subtitle}</p>}
+        <div className="gallery-header">
+          {title && <h2 className="section-title">{title}</h2>}
+          {subtitle && <p className="section-subtitle">{subtitle}</p>}
+        </div>
         
         <div className="gallery-categories">
           {categories.map(category => (
@@ -291,10 +293,6 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                         loading="lazy"
                         onError={(e) => {
                           console.error('Image failed to load:', e.target.src);
-                          // Debug what URL we actually tried to load
-                          console.error('Original image src:', subcategory.images[0].src);
-                          console.error('VITE_API_URL:', import.meta.env.VITE_API_URL);
-                          console.error('Constructed URL:', `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`);
                           e.target.onerror = null;
                           e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
                         }}

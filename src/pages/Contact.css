@@ -675,6 +675,16 @@
 .gallery-section {
   padding: 4rem 0;
   background-color: #f8f9fa;
+  position: relative;
+}
+
+.gallery-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background-color: rgba(44, 85, 88, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .gallery-section .container {
@@ -683,20 +693,35 @@
   padding: 0 1.5rem;
 }
 
-.section-title {
-  text-align: center;
-  color: #333;
+.gallery-section .section-title {
+  color: #234447; /* Even darker cadetblue for title */
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-bottom: 0.75rem;
-  font-size: 2.25rem;
+  position: relative;
+  text-align: center;
 }
 
-.section-subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 2rem;
+.gallery-section .section-title:after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #234447; /* Match title color */
+  margin: 15px auto 0;
+  border-radius: 2px;
+}
+
+.gallery-section .section-subtitle {
+  color: #395e61; /* Darker shade for subtitle */
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 0;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
 }
 
 .gallery-section::before {
@@ -712,6 +737,19 @@
   z-index: -1;
 }
 
+.gallery-category-content {
+  margin-top: 1.5rem;
+}
+
+.gallery-category-description {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  color: #395e61; /* Darker shade for subtitle */
+  line-height: 1.6;
+  font-weight: 500;
+}
+
 .gallery-categories {
   display: flex;
   justify-content: center;
@@ -723,34 +761,49 @@
 .gallery-category-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  background-color: #f0f0f0;
-  color: #555;
+  background-color: #e0e5e5;
+  color: #2c5558; /* Darker cadetblue */
   border-radius: 30px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .gallery-category-btn.active {
-  background-color: cadetblue;
+  background-color: #2c5558; /* Darker cadetblue */
   color: white;
-  box-shadow: 0 4px 10px rgba(95, 158, 160, 0.25);
+  box-shadow: 0 4px 10px rgba(44, 85, 88, 0.25);
 }
 
 .gallery-category-btn:hover {
-  background-color: #e0e0e0;
+  background-color: #d0d5d5;
 }
 
 .gallery-category-btn.active:hover {
-  background-color: cadetblue;
+  background-color: #234447; /* Even darker when active+hover */
 }
 
-.gallery-category-description {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  color: #555;
-  line-height: 1.6;
+/* Gallery items equal height */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Make each row have equal heights */
+.gallery-grid::before {
+  content: '';
+  width: 0;
+  padding-bottom: 100%;
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+
+.gallery-grid > *:first-child {
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
 }
 
 /* Mobile category indicator */
@@ -794,6 +847,7 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
   cursor: pointer;
+  background-color: white;
 }
 
 .gallery-image-container {
@@ -801,6 +855,7 @@
   width: 100%;
   padding-top: 66.67%; /* 3:2 aspect ratio */
   overflow: hidden;
+  height: 0; /* Important for aspect ratio */
 }
 
 .gallery-image-container img {
@@ -1817,8 +1872,9 @@
 }
 
 .gallery-content h3 {
-  margin: 0 0 0.75rem 0;
+  margin: 0;
   font-size: 1.25rem;
-  color: #333;
+  color: #2c5558; /* Darker cadetblue */
   text-align: center;
+  font-weight: 600;
 } 

@@ -75,6 +75,20 @@ const isDefaultDate = (dateString, promotion) => {
   }
 };
 
+// Helper function to get optimized image URL
+const getOptimizedImageUrl = (imagePath, format = 'webp') => {
+  if (!imagePath) return 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
+  
+  // For already external URLs
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  
+  // For internal images from our backend
+  const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '');
+  return `${baseUrl}/uploads/${imagePath}?format=${format}`;
+};
+
 const PromotionCarousel = ({ promotions }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -296,13 +310,30 @@ const PromotionCarousel = ({ promotions }) => {
                       </div>
                     </div>
                     <div className="promotion-image">
-                      <img 
-                        src={promotion.image ? `${(import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '')}/uploads/${promotion.image}` : 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg'}
-                        alt={promotion.title}
-                        onError={(e) => {
-                          e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
-                        }}
-                      />
+                      {promotion.image ? (
+                        <picture>
+                          <source 
+                            srcSet={getOptimizedImageUrl(promotion.image, 'webp')} 
+                            type="image/webp" 
+                          />
+                          <source 
+                            srcSet={getOptimizedImageUrl(promotion.image, 'jpg')} 
+                            type="image/jpeg" 
+                          />
+                          <img 
+                            src={`${(import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('/api', '')}/uploads/${promotion.image}`}
+                            alt={promotion.title}
+                            onError={(e) => {
+                              e.target.src = 'https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg';
+                            }}
+                          />
+                        </picture>
+                      ) : (
+                        <img 
+                          src="https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg"
+                          alt={promotion.title}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

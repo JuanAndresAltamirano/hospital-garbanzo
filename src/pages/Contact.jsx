@@ -197,6 +197,24 @@ const fallbackGallery = {
   }
 };
 
+// Add helper function to handle image URL formatting and WebP support
+const getOptimizedImageUrl = (imageSrc, options = {}) => {
+  if (!imageSrc) return 'https://via.placeholder.com/300x250?text=No+Image';
+  
+  // For external images, return as is (can't optimize external URLs)
+  if (imageSrc.startsWith('http')) {
+    return imageSrc;
+  }
+  
+  // For internal images, construct the path and add format query
+  const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+  const width = options.width || '';
+  const format = options.format || 'webp';
+  
+  // Assuming your backend can handle format and width parameters
+  return `${baseUrl}${imageSrc}?format=${format}${width ? `&width=${width}` : ''}`;
+};
+
 // Categorized Gallery component
 const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
   const [activeCategory, setActiveCategory] = useState(null);
@@ -284,20 +302,36 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                       onClick={() => onImageClick(currentCategory.id, 0, subcategory.id)}
                     >
                       <div className="gallery-image-container">
-                        <img 
-                          src={subcategory.images && subcategory.images.length > 0 
-                            ? (subcategory.images[0].src.startsWith('http') 
-                              ? subcategory.images[0].src 
-                              : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`)
-                            : 'https://via.placeholder.com/300x250?text=No+Image'}
-                          alt={subcategory.name || 'Imagen de galería'} 
-                          loading="lazy"
-                          onError={(e) => {
-                            console.error('Image failed to load:', e.target.src);
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
-                          }}
-                        />
+                        {subcategory.images && subcategory.images.length > 0 ? (
+                          <picture>
+                            <source 
+                              srcSet={getOptimizedImageUrl(subcategory.images[0].src, {format: 'webp', width: 300})} 
+                              type="image/webp" 
+                            />
+                            <source 
+                              srcSet={getOptimizedImageUrl(subcategory.images[0].src, {format: 'jpg', width: 300})} 
+                              type="image/jpeg" 
+                            />
+                            <img 
+                              src={subcategory.images[0].src.startsWith('http') 
+                                ? subcategory.images[0].src 
+                                : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${subcategory.images[0].src}`}
+                              alt={subcategory.name || 'Imagen de galería'} 
+                              loading="lazy"
+                              onError={(e) => {
+                                console.error('Image failed to load:', e.target.src);
+                                e.target.onerror = null;
+                                e.target.src = 'https://via.placeholder.com/300x250?text=Imagen+No+Disponible';
+                              }}
+                            />
+                          </picture>
+                        ) : (
+                          <img 
+                            src='https://via.placeholder.com/300x250?text=No+Image'
+                            alt={subcategory.name || 'Imagen no disponible'} 
+                            loading="lazy"
+                          />
+                        )}
                         <div className="gallery-overlay">
                           <FaImage aria-hidden="true" style={{ fontSize: '2rem', marginBottom: '0.75rem' }} />
                           <span>{subcategory.description || subcategory.name}</span>
@@ -397,14 +431,24 @@ const GalleryModal = ({ isOpen, categories, subcategoryImages, currentCategory, 
         <div className="gallery-category-top">{displayTitle.toUpperCase()}</div>
         
         <div className="gallery-image-area">
-          <img 
-            src={currentImage.src.startsWith('http') 
-                 ? currentImage.src 
-                 : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${currentImage.src}`} 
-            alt={currentImage.alt || 'Imagen ampliada'} 
-            className="gallery-modal-image"
-            onError={handleImageError}
-          />
+          <picture>
+            <source 
+              srcSet={getOptimizedImageUrl(currentImage.src, {format: 'webp'})} 
+              type="image/webp" 
+            />
+            <source 
+              srcSet={getOptimizedImageUrl(currentImage.src, {format: 'jpg'})} 
+              type="image/jpeg" 
+            />
+            <img 
+              src={currentImage.src.startsWith('http') 
+                  ? currentImage.src 
+                  : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${currentImage.src}`} 
+              alt={currentImage.alt || 'Imagen ampliada'} 
+              className="gallery-modal-image"
+              onError={handleImageError}
+            />
+          </picture>
         </div>
         
         <div className="gallery-info-area">

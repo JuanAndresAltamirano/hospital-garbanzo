@@ -120,7 +120,7 @@ export class GalleryService {
     console.log('Received file:', file); // Debug log
 
     // Build the image URL using the full file info
-    const imageUrl = `http://localhost:3001/uploads/${file.filename}`;
+    const imageUrl = `/uploads/${file.filename}`;
     console.log('Image URL:', imageUrl);
 
     const newImage = this.imagesRepository.create({
@@ -142,7 +142,7 @@ export class GalleryService {
 
     if (file) {
       // Build the image URL using the full file info
-      const imageUrl = `http://localhost:3001/uploads/${file.filename}`;
+      const imageUrl = `/uploads/${file.filename}`;
       console.log('Updated image URL:', imageUrl);
       updatedImage.src = imageUrl;
     }

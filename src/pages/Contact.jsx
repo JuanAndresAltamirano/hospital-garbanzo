@@ -271,7 +271,9 @@ const CategorizedGallery = ({ title, subtitle, categories, onImageClick }) => {
                     <div className="gallery-image-container">
                       <img 
                         src={subcategory.images && subcategory.images.length > 0 
-                          ? subcategory.images[0].src 
+                          ? (subcategory.images[0].src.startsWith('http') 
+                             ? subcategory.images[0].src 
+                             : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${subcategory.images[0].src}`)
                           : 'https://via.placeholder.com/300x250?text=No+Image'}
                         alt={subcategory.name || 'Imagen de galería'} 
                         loading="lazy"
@@ -380,7 +382,9 @@ const GalleryModal = ({ isOpen, categories, subcategoryImages, currentCategory, 
         
         <div className="gallery-image-area">
           <img 
-            src={currentImage.src} 
+            src={currentImage.src.startsWith('http') 
+                 ? currentImage.src 
+                 : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${currentImage.src}`} 
             alt={currentImage.alt || 'Imagen ampliada'} 
             className="gallery-modal-image"
             onError={handleImageError}

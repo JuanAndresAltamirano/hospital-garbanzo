@@ -286,7 +286,7 @@ const PromotionCarousel = ({ promotions }) => {
                       
                       <div className="promotion-button-wrapper">
                         <a 
-                          href={`/promociones/${promotion.id}`}
+                          href={`https://wa.me/593987654321?text=Hola%2C%20quisiera%20informacion%20sobre%20la%20promocion%20${encodeURIComponent(promotion.title)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="promotion-button"
